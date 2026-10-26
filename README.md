@@ -92,6 +92,26 @@ GTK4 apps follow it right away.
 
 Options: `--no-apply`, `--no-gtk4`, `--no-wallpaper`, `--no-follow`, `--no-flatpak`, `--no-cursors` (see `./install.sh --help`).
 
+### Extensions
+
+Tested with:
+
+| Extension | Notes |
+|---|---|
+| **Dash to Dock** | The dock takes the glass of the current mode, with round glass bubbles on the icons |
+| **AppIndicator and KStatusNotifierItem Support** | Tray icons sit in the right island |
+| **Dynamic Music Pill** | Sits in the dock with the other icons. The pill keeps its own colors (from the album art), since the extension sets them itself |
+| **Blur my Shell** | Real blur behind the overview, the dock and the lock screen. Two settings keep the look of the theme, see below |
+
+With **Blur my Shell**, turn off the blur of the panel, which would draw a band across the whole
+top of the screen behind the floating islands, and let the dock keep the glass of the theme
+(in its settings: Panel → off; Dash to Dock → "Override background" off):
+
+```bash
+dconf write /org/gnome/shell/extensions/blur-my-shell/panel/blur false
+dconf write /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/override-background false
+```
+
 ### Uninstall
 
 ```bash
@@ -116,6 +136,7 @@ extras/gnomeglass-follow-scheme follows light/dark mode
 extras/gnomeglass-lockscreen@gnomeglass
                                 extension that keeps the Shell theme on the lock screen
 tools/check-css                 parses the built GTK stylesheets with GTK (run by build.sh)
+tools/harness                   runs the theme in an isolated, headless GNOME Shell for screenshots
 tools/make-wallpapers           generates the "Lumen" day/night SVGs
 tools/make-cursors              draws and renders the cursor theme (run by build.sh)
 wallpapers/                     "Lumen" day/night SVGs
@@ -145,6 +166,19 @@ After editing anything in `src/`, run `./build.sh` and then `./install.sh`.
   librsvg at every size and writes the Xcursor files itself (no `xcursorgen` needed);
   `--preview FILE.png` also draws the strip shown above.
 - **GTK3/GTK4 apps:** just close and reopen them.
+- **Testing without touching your session:** `tools/harness` starts a headless GNOME Shell with
+  its own home folder, settings and display, using the themes straight from `themes/`. It can
+  load extensions (a copy, so it never writes to yours), open apps, click and take screenshots:
+
+  ```bash
+  tools/harness start dark --ext dash-to-dock@micxgx.gmail.com
+  tools/harness run gnome-text-editor
+  tools/harness shot editor        # ~/.cache/gnomeglass-harness/shots/editor.png
+  tools/harness reload             # after ./build.sh, for the Shell theme
+  tools/harness stop
+  ```
+
+  `tools/harness --help` lists the rest (eval, click, gsettings, dconf…).
 - **Shell:** on Wayland there is no `Alt+F2` → `r`. To reload the theme, disable and re-enable User Themes:
 
   ```bash
@@ -159,10 +193,10 @@ When releasing a version, update `VERSION`, the version line at the top of this 
 
 ## Known limitations
 
-- **No real blur.** Shell themes and GTK CSS cannot blur what is behind a surface. The glass is
-  translucent only where it sits over the wallpaper (the top bar islands, the dash, OSD,
-  Alt+Tab); menus, popups and notifications are opaque so that text behind them never shows
-  through. Blur extensions have not been tested with the theme yet.
+- **No real blur by itself.** Shell themes and GTK CSS cannot blur what is behind a surface. The
+  glass is translucent only where it sits over the wallpaper (the top bar islands, the dash,
+  OSD, Alt+Tab); menus, popups and notifications are opaque so that text behind them never
+  shows through. For real blur, use Blur my Shell with the settings in [Extensions](#extensions).
 - **libadwaita has no official theming support.** The look of GTK4 apps comes from `~/.config/gtk-4.0/gtk.css`.
   It works well, but a major libadwaita update may need adjustments.
 - **GTK3 apps** always use GNOME's default blue, since GTK3 cannot read the accent color.

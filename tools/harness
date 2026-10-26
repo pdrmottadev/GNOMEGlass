@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+# Runs the theme in an isolated, headless GNOME Shell and takes screenshots, without
+# touching your session: its own HOME, dconf, D-Bus and Wayland display.
+#
+#   tools/harness start [light|dark] [--ext UUID|DIR]...   start it (extensions: from
+#                                    ~/.local/share/gnome-shell/extensions or a folder)
+#   tools/harness shot NAME|FILE.png  screenshot (shotc: with the cursor)
+#   tools/harness run CMD...          start an app inside it
+#   tools/harness closeall            close the apps started with run (and Files)
+#   tools/harness eval JS             run JavaScript in the Shell
+#   tools/harness move X Y | click X Y [BUTTON]   (1 left, 2 middle, 3 right)
+#   tools/harness gs ARGS...          gsettings inside it
+#   tools/harness dconf ARGS...       dconf inside it (e.g. load your extension settings:
+#                                    dconf dump /PATH/ | tools/harness dconf load /PATH/)
+#   tools/harness reload              reload the Shell theme after ./build.sh
+#   tools/harness stop
+#
+# GTK apps read the built themes directly from themes/, so after ./build.sh just
+# reopen them. State and screenshots go to ~/.cache/gnomeglass-harness
+# (or $GNOMEGLASS_HARNESS).
+set -euo pipefail
+
+REPO=$(dirname "$(dirname "$(readlink -f "$0")")")
+STATE=${GNOMEGLASS_HARNESS:-${XDG_CACHE_HOME:-$HOME/.cache}/gnomeglass-harness}
+# The Wayland socket path is limited to 108 bytes, so the runtime dir must be short
+RUNTIME=/run/user/$(id -u)/gnomeglass
+DISPLAY_NAME=gnomeglass-0
+EXT_DIR=$STATE/home/.local/share/gnome-shell/extensions
+HELPER=harness@gnomeglass
+
+session_env() {
+  export HOME=$STATE/home XDG_CONFIG_HOME=$STATE/config XDG_DATA_HOME=$STATE/home/.local/share \
+         XDG_CACHE_HOME=$STATE/home/.cache XDG_RUNTIME_DIR=$RUNTIME
+  unset DISPLAY WAYLAND_DISPLAY XDG_SESSION_TYPE
+}
+
+# Every process of the harness session: they all carry its runtime dir
+session_pids() {
+  grep -lzx "XDG_RUNTIME_DIR=$RUNTIME" /proc/[0-9]*/environ 2>/dev/null | cut -d/ -f3 || true
+}
+
+client_env() {
+  [[ -f $STATE/bus ]] || { echo "error: the harness is not running (tools/harness start)" >&2; exit 1; }
+  session_env
+  export DBUS_SESSION_BUS_ADDRESS=$(cat "$STATE/bus") WAYLAND_DISPLAY=$DISPLAY_NAME
+}
+
+ev() {
+  gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
+    --method org.gnome.Shell.Eval "$1"
+}
+
+shot() { # $1 = include cursor, $2 = name or path
+  local out=$2
+  [[ $out == */* || $out == *.png ]] || out=$STATE/shots/$out.png
+  mkdir -p "$(dirname "$out")"
+  out=$(readlink -f "$out")
+  gdbus call --session --dest org.gnome.Shell.Screenshot --object-path /org/gnome/Shell/Screenshot \
+    --method org.gnome.Shell.Screenshot.Screenshot "$1" false "$out" >/dev/null
+  echo "$out"
+}
+
+# Virtual pointer, created once and kept on globalThis
+PTR='const C = imports.gi.Clutter, G = imports.gi.GLib;
+globalThis._ggPointer ??= C.get_default_backend().get_default_seat().create_virtual_device(C.InputDeviceType.POINTER_DEVICE);
+const p = globalThis._ggPointer, t = () => G.get_monotonic_time();'
+
+start() {
+  local scheme=light exts=() ext name
+  while (( $# )); do
+    case "$1" in
+      light|dark) scheme=$1 ;;
+      --ext) ext=$2; shift
+             [[ -d $ext ]] || ext=${XDG_DATA_HOME:-$HOME/.local/share}/gnome-shell/extensions/$ext
+             [[ -f $ext/metadata.json ]] || { echo "error: no extension at $ext" >&2; exit 1; }
+             exts+=("$ext") ;;
+      *) echo "unknown option: $1" >&2; exit 1 ;;
+    esac
+    shift
+  done
+  [[ -z $(session_pids) ]] || { echo "error: already running (tools/harness stop)" >&2; exit 1; }
+
+  rm -rf "$STATE/home" "$STATE/config" "$STATE/bus"
+  mkdir -p "$EXT_DIR/$HELPER" "$STATE/config/gtk-4.0" "$STATE/home/.local/share/icons" "$STATE/shots"
+  mkdir -p -m 700 "$RUNTIME"
+
+  # Unsafe mode unlocks the Eval and Screenshot D-Bus methods
+  cat > "$EXT_DIR/$HELPER/metadata.json" <<'EOF'
+{"uuid": "harness@gnomeglass", "name": "GNOME Glass harness", "description": "Unsafe mode for tools/harness",
+ "shell-version": ["50", "51", "52"], "session-modes": ["user", "unlock-dialog"]}
+EOF
+  cat > "$EXT_DIR/$HELPER/extension.js" <<'EOF'
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+
+export default class Harness extends Extension {
+    enable() { global.context.unsafe_mode = true; }
+    disable() {}
+}
+EOF
+
+  # Symlinks, so a rebuild shows up without restarting
+  ln -s "$REPO/themes" "$STATE/home/.themes"
+  ln -s "$REPO/extras/gnomeglass-lockscreen@gnomeglass" "$EXT_DIR/"
+  ln -s "$REPO/themes/GNOMEGlass/gtk-4.0/libadwaita.css" "$STATE/config/gtk-4.0/gtk.css"
+  [[ -d $REPO/themes/GNOMEGlass-Cursors ]] &&
+    ln -s "$REPO/themes/GNOMEGlass-Cursors" "$STATE/home/.local/share/icons/"
+
+  local enabled="'$HELPER', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'gnomeglass-lockscreen@gnomeglass'"
+  for ext in "${exts[@]}"; do
+    name=$(basename "$ext")
+    cp -r "$ext" "$EXT_DIR/$name"   # a copy, so the harness never writes to your extensions
+    # Packages from extensions.gnome.org leave this to `gnome-extensions install`
+    if [[ -d $EXT_DIR/$name/schemas && ! -f $EXT_DIR/$name/schemas/gschemas.compiled ]]; then
+      glib-compile-schemas "$EXT_DIR/$name/schemas"
+    fi
+    enabled+=", '$name'"
+  done
+
+  export GG_STATE=$STATE GG_REPO=$REPO GG_DISPLAY=$DISPLAY_NAME GG_ENABLED="[$enabled]"
+  if [[ $scheme == dark ]]; then
+    export GG_THEME=GNOMEGlass-Dark GG_SCHEME=prefer-dark
+  else
+    export GG_THEME=GNOMEGlass GG_SCHEME=default
+  fi
+  session_env
+  unset DBUS_SESSION_BUS_ADDRESS
+  setsid dbus-run-session -- bash -c '
+    echo "$DBUS_SESSION_BUS_ADDRESS" > "$GG_STATE/bus"
+    gsettings set org.gnome.shell enabled-extensions "$GG_ENABLED"
+    gsettings set org.gnome.shell welcome-dialog-last-shown-version "999"
+    gsettings set org.gnome.shell.extensions.user-theme name "$GG_THEME"
+    gsettings set org.gnome.desktop.interface color-scheme "$GG_SCHEME"
+    gsettings set org.gnome.desktop.interface gtk-theme "$GG_THEME"
+    gsettings set org.gnome.desktop.interface cursor-theme GNOMEGlass-Cursors
+    gsettings set org.gnome.desktop.interface enable-hot-corners false
+    gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu:minimize,maximize,close"
+    gsettings set org.gnome.desktop.background picture-uri "file://$GG_REPO/wallpapers/gnomeglass-day.svg"
+    gsettings set org.gnome.desktop.background picture-uri-dark "file://$GG_REPO/wallpapers/gnomeglass-night.svg"
+    exec gnome-shell --headless --wayland --no-x11 --wayland-display="$GG_DISPLAY" --virtual-monitor 1600x1000
+  ' > "$STATE/shell.log" 2>&1 < /dev/null &
+
+  # Ready once the helper extension has turned on unsafe mode
+  for _ in $(seq 60); do
+    sleep 0.5
+    if [[ -s $STATE/bus ]]; then
+      export DBUS_SESSION_BUS_ADDRESS=$(cat "$STATE/bus")
+      # Then wait for the startup animation, leave the overview it ends in and
+      # drop the "unsafe mode" notification
+      if ev '!Main.layoutManager._startingUp' 2>/dev/null | grep -q "'true'"; then
+        ev 'Main.overview.hide(); Main.messageTray.getSources().forEach(s => s.destroy()); 1' >/dev/null
+        for _ in $(seq 20); do
+          ev 'Main.overview.visible' | grep -q "'false'" && break
+          sleep 0.25
+        done
+        echo "Harness running ($scheme). Log: $STATE/shell.log"
+        return
+      fi
+    fi
+  done
+  echo "error: the Shell did not start, see $STATE/shell.log" >&2
+  stop
+  exit 1
+}
+
+stop() {
+  local pids
+  pids=$(session_pids)
+  [[ -n $pids ]] && kill $pids 2>/dev/null || true
+  sleep 1
+  pids=$(session_pids)
+  [[ -n $pids ]] && kill -9 $pids 2>/dev/null || true
+  for mnt in "$RUNTIME"/gvfs "$RUNTIME"/doc; do
+    mountpoint -q "$mnt" 2>/dev/null && fusermount3 -u "$mnt" || true
+  done
+  rm -f "$STATE/bus" "$STATE/pids"
+}
+
+cmd=${1:-}; shift || true
+case "$cmd" in
+  start)  start "$@" ;;
+  stop)   stop ;;
+  eval)   client_env; ev "$1" ;;
+  shot)   client_env; shot false "$1" ;;
+  shotc)  client_env; shot true "$1" ;;
+  run)    client_env
+          setsid "$@" >> "$STATE/apps.log" 2>&1 < /dev/null &
+          echo $! >> "$STATE/pids" ;;
+  closeall)
+          client_env
+          [[ -f $STATE/pids ]] && xargs -r kill < "$STATE/pids" 2>/dev/null || true
+          rm -f "$STATE/pids"
+          # Files is D-Bus activated and stays alive, keeping the old CSS
+          for pid in $(session_pids); do
+            [[ $(cat /proc/$pid/comm 2>/dev/null) == nautilus ]] && kill "$pid" || true
+          done
+          sleep 0.5 ;;
+  gs)     client_env; gsettings "$@" ;;
+  dconf)  client_env; dconf "$@" ;;
+  move)   client_env; ev "$PTR p.notify_absolute_motion(t(), $1, $2); 1" >/dev/null ;;
+  click)  client_env
+          ev "$PTR p.notify_absolute_motion(t(), $1, $2);
+              p.notify_button(t(), ${3:-1}, C.ButtonState.PRESSED);
+              p.notify_button(t(), ${3:-1}, C.ButtonState.RELEASED); 1" >/dev/null ;;
+  reload) client_env
+          theme=$(gsettings get org.gnome.shell.extensions.user-theme name)
+          gsettings set org.gnome.shell.extensions.user-theme name "''"
+          sleep 0.5
+          gsettings set org.gnome.shell.extensions.user-theme name "$theme" ;;
+  *)      sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; [[ $cmd == -h || $cmd == --help ]] ;;
+esac

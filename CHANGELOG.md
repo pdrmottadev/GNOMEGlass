@@ -3,6 +3,17 @@
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+
+- `tools/harness`, which runs the theme in an isolated, headless GNOME Shell (its own home
+  folder, settings, D-Bus and display) to try changes and take screenshots without touching
+  your session. It can load extensions, open apps and click.
+- README: the extensions the theme was tested with (Dash to Dock, AppIndicator, Dynamic Music
+  Pill, Blur my Shell), and the two Blur my Shell settings that keep the floating islands and
+  the glass of the dock.
+
 ## 1.1.0 - 2026-10-26
 
 ### Added
