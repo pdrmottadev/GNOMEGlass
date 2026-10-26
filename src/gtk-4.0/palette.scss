@@ -1,0 +1,80 @@
+// GNOME Glass — GTK 4 --glass-* variables, generated from _palette.scss
+//
+// build.sh compiles this file and puts it before gtk.css. The palette is
+// imported twice: libsass re-evaluates @import, so each pass recomputes the
+// colors with the current $variant. The accent itself is not here: gtk.css
+// uses libadwaita's --accent-bg-color, which follows the system setting.
+
+@mixin glass-vars {
+  --glass-bg: #{$bg};
+  --glass-fg: #{$fg};
+  --glass-fg-dim: #{$fg-dim};
+  --glass-view-bg: #{$view-bg};
+  --glass-view-fg: #{$view-fg};
+  --glass-card-bg: #{$card-bg};
+  --glass-card-border: #{$card-border};
+  --glass-sidebar-bg: #{$sidebar-bg};
+  --glass-sidebar-fg: #{$sidebar-fg};
+  --glass-sidebar-backdrop: #{$sidebar-backdrop};
+  --glass-sidebar-border: #{$sidebar-border};
+  --glass-secondary-sidebar-bg: #{$secondary-sidebar-bg};
+  --glass-secondary-sidebar-backdrop: #{$secondary-sidebar-backdrop};
+  --glass-popover-bg: #{$popover-bg};
+  --glass-popover-fg: #{$popover-fg};
+  --glass-dialog-bg: #{$dialog-bg};
+
+  --glass-rim: #{$rim};
+  --glass-edge: #{$edge};
+  --glass-hairline: #{$hairline};
+
+  --glass-title-top: #{$title-top};
+  --glass-title-bottom: #{$title-bottom};
+  --glass-title-backdrop: #{$title-backdrop};
+  --glass-title-mid: #{$title-mid};
+  --glass-title-fg: #{$title-fg};
+  --glass-title-tint: #{$title-tint};
+  --glass-orb-top: #{$orb-top};
+  --glass-orb-bottom: #{$orb-bottom};
+
+  --glass-btn-top: #{$btn-top};
+  --glass-btn-bottom: #{$btn-bottom};
+  --glass-btn-edge: #{$btn-edge};
+  --glass-btn-fg: #{$btn-fg};
+
+  --glass-entry-bg: #{$entry-bg};
+  --glass-entry-edge: #{$entry-edge};
+  --glass-trough: #{$trough};
+  --glass-recess: #{$recess};
+
+  --glass-ember-top: #{$ember-top};
+  --glass-ember: #{$ember};
+  --glass-ember-edge: #{$ember-edge};
+  --glass-ember-glow: #{$ember-glow};
+
+  --glass-smoke: #{$smoke};
+  --glass-smoke-solid: #{$smoke-solid};
+  --glass-smoke-fg: #{$smoke-fg};
+  --glass-smoke-rim: #{$smoke-rim};
+
+  --glass-success: #{$success};
+  --glass-error: #{$error};
+  --glass-success-text: #{$success-text};
+  --glass-warning-text: #{$warning-text};
+  --glass-error-text: #{$error-text};
+}
+
+$variant: 'light';
+@import '../palette';
+
+:root {
+  @include glass-vars;
+}
+
+$variant: 'dark';
+@import '../palette';
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include glass-vars;
+  }
+}

@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+"""Generates the GNOME Glass cursor theme (Xcursor files) from vector shapes.
+
+  tools/make-cursors [OUTPUT_DIR]          (default: themes/GNOMEGlass-Cursors)
+  tools/make-cursors --preview FILE.png    also writes a preview strip
+
+Every shape is drawn on a 24x24 grid (the nominal cursor size) and rendered
+with librsvg at each size in SIZES. The Xcursor files are written directly
+(no xcursorgen needed): cairo's premultiplied ARGB32 is exactly the pixel
+format Xcursor expects.
+"""
+import math
+import os
+import shutil
+import struct
+import sys
+
+import cairo
+import gi
+
+gi.require_version('Rsvg', '2.0')
+from gi.repository import Rsvg  # noqa: E402
+
+SIZES = (24, 30, 36, 48, 72, 96)
+FRAMES = 60          # animation frames per turn of the spinner
+FRAME_DELAY = 16     # ms per frame (~1 turn per second)
+
+OUTLINE = '#0f1828'
+
+# Glass gradients: light on top, a "horizon" halfway down (the Aero gloss),
+# deeper below
+GRADIENTS = {
+    'glass': ('#ffffff', '#f3f7fd', '#dce7f8', '#c8d8ef'),
+    'blue':  ('#b4dbff', '#63aef8', '#2f80e0', '#1a5cb4'),
+    'ember': ('#ffb6a6', '#ff7d68', '#e5483b', '#b3261b'),
+    'green': ('#a6ecc2', '#47c682', '#26a269', '#1a7a4c'),
+    'smoke': ('#7a8396', '#454e60', '#2a303d', '#1b2029'),
+}
+
+DEFS = ''.join(f'''
+  <linearGradient id="{name}" x1="0" y1="0" x2="0.55" y2="1">
+    <stop offset="0" stop-color="{a}"/><stop offset="0.48" stop-color="{b}"/>
+    <stop offset="0.5" stop-color="{c}"/><stop offset="1" stop-color="{d}"/>
+  </linearGradient>''' for name, (a, b, c, d) in GRADIENTS.items()) + '''
+  <filter id="drop" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="0.7"/>
+    <feOffset dx="0.35" dy="0.9" result="blur"/>
+    <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+    <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>'''
+
+_ids = iter(range(1, 1 << 30))
+
+
+def svg(*parts):
+    return ('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">'
+            f'<defs>{DEFS}</defs><g filter="url(#drop)">{"".join(parts)}</g></svg>')
+
+
+def glass(d, fill='glass', transform=''):
+    """A glass shape: dark outline outside, gradient fill, bright rim inside."""
+    clip = f'c{next(_ids)}'
+    t = f' transform="{transform}"' if transform else ''
+    return (f'<g{t}>'
+            f'<clipPath id="{clip}"><path d="{d}"/></clipPath>'
+            f'<path d="{d}" fill="{OUTLINE}" stroke="{OUTLINE}" stroke-width="2.2" stroke-linejoin="round"/>'
+            f'<path d="{d}" fill="url(#{fill})"/>'
+            f'<path d="{d}" fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.1" '
+            f'clip-path="url(#{clip})"/>'
+            '</g>')
+
+
+def circle_path(cx, cy, r):
+    return f'M {cx - r} {cy} a {r} {r} 0 1 0 {2 * r} 0 a {r} {r} 0 1 0 {-2 * r} 0 Z'
+
+
+# --- Shapes (24x24 grid) ----------------------------------------------------
+
+ARROW = 'M 3.5 2 L 3.5 18.6 L 7.5 14.9 L 10.1 20.8 L 12.9 19.6 L 10.3 13.8 L 15.8 13.8 Z'
+
+POINTING_HAND = ('M 8 14.2 L 8 4.2 A 1.5 1.5 0 0 1 11 4.2 L 11 9.4 A 1.3 1.3 0 0 1 13.6 9.4 '
+                 'L 13.6 9.9 A 1.3 1.3 0 0 1 16.2 9.9 L 16.2 10.6 A 1.2 1.2 0 0 1 18.6 10.6 '
+                 'L 18.6 16 C 18.6 19 16.8 21 14.5 21 L 11.5 21 C 9.5 21 8.6 20 7.6 18.6 '
+                 'L 4.9 14.8 A 1.25 1.25 0 0 1 6.9 13.3 Z')
+POINTING_CREASES = ((11, 9.4, 12.3), (13.6, 9.9, 12.5), (16.2, 10.6, 12.7))
+
+OPEN_HAND = ('M 7.2 13 L 7.2 5.7 A 1.25 1.25 0 0 1 9.7 5.7 L 9.7 4.4 A 1.25 1.25 0 0 1 12.2 4.4 '
+             'L 12.2 5 A 1.25 1.25 0 0 1 14.7 5 L 14.7 7.2 A 1.15 1.15 0 0 1 17 7.2 L 17 15.5 '
+             'C 17 19 15.2 21 12.6 21 L 10.8 21 C 8.8 21 7.9 20.2 6.9 18.8 L 3.9 14.3 '
+             'A 1.25 1.25 0 0 1 5.9 12.8 L 7.2 14.6 Z')
+OPEN_CREASES = ((9.7, 5.7, 11.5), (12.2, 4.4, 11.5), (14.7, 5, 11.5))
+
+FIST = ('M 7.2 11.4 A 1.3 1.3 0 0 1 9.7 10.6 A 1.3 1.3 0 0 1 12.2 10 A 1.3 1.3 0 0 1 14.7 10.3 '
+        'A 1.2 1.2 0 0 1 17 11 L 17 15.5 C 17 19 15.2 21 12.6 21 L 10.8 21 C 8.8 21 7.9 20.2 6.9 18.8 '
+        'L 5 16 A 1.25 1.25 0 0 1 6.9 14.6 L 7.2 15 Z')
+FIST_CREASES = ((9.7, 10.9, 13.2), (12.2, 10.3, 13.2), (14.7, 10.6, 13.2))
+
+IBEAM = ('M 8.5 3.5 L 10.5 3.5 C 11.3 3.5 11.7 4 12 4.4 C 12.3 4 12.7 3.5 13.5 3.5 L 15.5 3.5 '
+         'L 15.5 5 L 13.8 5 C 13.1 5 12.8 5.5 12.8 6.2 L 12.8 11.2 L 14 11.2 L 14 12.8 L 12.8 12.8 '
+         'L 12.8 17.8 C 12.8 18.5 13.1 19 13.8 19 L 15.5 19 L 15.5 20.5 L 13.5 20.5 '
+         'C 12.7 20.5 12.3 20 12 19.6 C 11.7 20 11.3 20.5 10.5 20.5 L 8.5 20.5 L 8.5 19 L 10.2 19 '
+         'C 10.9 19 11.2 18.5 11.2 17.8 L 11.2 12.8 L 10 12.8 L 10 11.2 L 11.2 11.2 L 11.2 6.2 '
+         'C 11.2 5.5 10.9 5 10.2 5 L 8.5 5 Z')
+
+CROSSHAIR = ('M 11.25 3 h 1.5 v 6.5 h -1.5 Z M 11.25 14.5 h 1.5 v 6.5 h -1.5 Z '
+             'M 3 11.25 h 6.5 v 1.5 h -6.5 Z M 14.5 11.25 h 6.5 v 1.5 h -6.5 Z')
+
+PLUS = 'M 9.8 4.5 h 4.4 v 5.3 h 5.3 v 4.4 h -5.3 v 5.3 h -4.4 v -5.3 h -5.3 v -4.4 h 5.3 Z'
+
+DOUBLE_ARROW = 'M 3 12 L 8 7 L 8 10.3 L 16 10.3 L 16 7 L 21 12 L 16 17 L 16 13.7 L 8 13.7 L 8 17 Z'
+
+SPLIT_ARROWS = ('M 2.5 12 L 6.8 7.8 L 6.8 10.4 L 9.4 10.4 L 9.4 13.6 L 6.8 13.6 L 6.8 16.2 Z '
+                'M 21.5 12 L 17.2 7.8 L 17.2 10.4 L 14.6 10.4 L 14.6 13.6 L 17.2 13.6 L 17.2 16.2 Z')
+SPLIT_BAR = 'M 10.9 3.5 h 2.2 v 17 h -2.2 Z'
+
+FOUR_WAY = ('M 12 2.5 L 15.8 6.5 L 13.4 6.5 L 13.4 10.6 L 17.5 10.6 L 17.5 8.2 L 21.5 12 L 17.5 15.8 '
+            'L 17.5 13.4 L 13.4 13.4 L 13.4 17.5 L 15.8 17.5 L 12 21.5 L 8.2 17.5 L 10.6 17.5 '
+            'L 10.6 13.4 L 6.5 13.4 L 6.5 15.8 L 2.5 12 L 6.5 8.2 L 6.5 10.6 L 10.6 10.6 L 10.6 6.5 '
+            'L 8.2 6.5 Z')
+
+
+def creases(lines):
+    return ''.join(f'<path d="M {x} {y0 + 0.6} L {x} {y1}" stroke="{OUTLINE}" stroke-opacity="0.55" '
+                   f'stroke-width="0.8" stroke-linecap="round"/>' for x, y0, y1 in lines)
+
+
+def ring(cx, cy, r, width, angle, fill='blue'):
+    """A glass ring with a colored arc (a quarter and a bit) at `angle`."""
+    circ = 2 * math.pi * r
+    return (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{OUTLINE}" stroke-width="{width + 2.2}"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="url(#glass)" stroke-width="{width}"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="url(#{fill})" stroke-width="{width}" '
+            f'stroke-linecap="round" stroke-dasharray="{circ * 0.3:.3f} {circ:.3f}" '
+            f'transform="rotate({angle} {cx} {cy})"/>'
+            # a fixed specular glint on the upper left of the ring
+            f'<circle cx="{cx}" cy="{cy}" r="{r + width * 0.18}" fill="none" stroke="#ffffff" '
+            f'stroke-opacity="0.8" stroke-width="{width * 0.3}" stroke-linecap="round" '
+            f'stroke-dasharray="{circ * 0.1:.3f} {circ * 2:.3f}" transform="rotate(200 {cx} {cy})"/>')
+
+
+def badge(fill, glyph):
+    """A small glass orb at the lower right of the arrow, with a white glyph."""
+    return glass(circle_path(17.6, 17.6, 4.5), fill) + glyph
+
+
+def white(d, width=1.4):
+    return (f'<path d="{d}" fill="none" stroke="#ffffff" stroke-width="{width}" '
+            'stroke-linecap="round" stroke-linejoin="round"/>')
+
+
+GLYPH_PLUS = white('M 17.6 15.6 L 17.6 19.6 M 15.6 17.6 L 19.6 17.6')
+GLYPH_MINUS = white('M 15.6 17.6 L 19.6 17.6')
+GLYPH_QUESTION = (white('M 16.2 16.4 C 16.2 15.4 16.9 14.9 17.6 14.9 C 18.4 14.9 19 15.5 19 16.2 '
+                        'C 19 17.2 17.7 17.3 17.7 18.4', 1.2)
+                  + '<circle cx="17.7" cy="20" r="0.7" fill="#ffffff"/>')
+GLYPH_LINK = white('M 15.6 19.4 C 15.6 17.2 16.8 16.2 19 16.2 M 17.6 14.7 L 19.3 16.2 L 17.6 17.7', 1.2)
+GLYPH_MENU = white('M 15.7 16 L 19.5 16 M 15.7 17.7 L 19.5 17.7 M 15.7 19.4 L 18.3 19.4', 1.0)
+
+
+def forbidden(cx, cy, r, width):
+    """Ember ring with a slash: outlines first, so they merge into one shape."""
+    k = r / math.sqrt(2)
+    slash = f'M {cx - k} {cy - k} L {cx + k} {cy + k}'
+    return (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{OUTLINE}" stroke-width="{width + 2.2}"/>'
+            f'<path d="{slash}" stroke="{OUTLINE}" stroke-width="{width + 2.2}"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="url(#ember)" stroke-width="{width}"/>'
+            f'<path d="{slash}" stroke="url(#ember)" stroke-width="{width}"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r + width * 0.2}" fill="none" stroke="#ffffff" '
+            f'stroke-opacity="0.7" stroke-width="{width * 0.28}" stroke-linecap="round" '
+            f'stroke-dasharray="{r * 0.9:.2f} {r * 20:.2f}" transform="rotate(195 {cx} {cy})"/>')
+
+
+def magnifier(glyph):
+    return (f'<path d="M 14.4 14.4 L 20 20" stroke="{OUTLINE}" stroke-width="5.4" stroke-linecap="round"/>'
+            f'<circle cx="10" cy="10" r="6.2" fill="none" stroke="{OUTLINE}" stroke-width="4.4"/>'
+            '<path d="M 14.4 14.4 L 20 20" stroke="url(#smoke)" stroke-width="3.2" stroke-linecap="round"/>'
+            '<circle cx="10" cy="10" r="5.1" fill="#a9d1ff" fill-opacity="0.45"/>'
+            '<ellipse cx="8.4" cy="7.6" rx="3" ry="1.8" fill="#ffffff" fill-opacity="0.55" '
+            'transform="rotate(-35 8.4 7.6)"/>'
+            '<circle cx="10" cy="10" r="6.2" fill="none" stroke="url(#glass)" stroke-width="2.2"/>'
+            + glyph)
+
+
+ZOOM_PLUS = (f'<path d="M 10 7.4 L 10 12.6 M 7.4 10 L 12.6 10" stroke="{OUTLINE}" '
+             'stroke-width="1.5" stroke-linecap="round"/>')
+ZOOM_MINUS = f'<path d="M 7.4 10 L 12.6 10" stroke="{OUTLINE}" stroke-width="1.5" stroke-linecap="round"/>'
+
+
+def static(*parts):
+    return lambda frame: svg(*parts)
+
+
+ARROW_SVG = glass(ARROW)
+
+# name: (hotspot x, y on the 24 grid, frame count, frame -> svg)
+CURSORS = {
+    'default':      (3.5, 2, 1, static(ARROW_SVG)),
+    'pointer':      (9.5, 2.8, 1, static(glass(POINTING_HAND), creases(POINTING_CREASES))),
+    'grab':         (11.5, 11, 1, static(glass(OPEN_HAND), creases(OPEN_CREASES))),
+    'grabbing':     (12, 13, 1, static(glass(FIST), creases(FIST_CREASES))),
+    'text':         (12, 12, 1, static(glass(IBEAM))),
+    'vertical-text': (12, 12, 1, static(glass(IBEAM, transform='rotate(90 12 12)'))),
+    'crosshair':    (12, 12, 1, static(glass(CROSSHAIR))),
+    'cell':         (12, 12, 1, static(glass(PLUS))),
+    'all-scroll':   (12, 12, 1, static(glass(FOUR_WAY))),
+    'ew-resize':    (12, 12, 1, static(glass(DOUBLE_ARROW))),
+    'ns-resize':    (12, 12, 1, static(glass(DOUBLE_ARROW, transform='rotate(90 12 12)'))),
+    'nwse-resize':  (12, 12, 1, static(glass(DOUBLE_ARROW, transform='rotate(45 12 12)'))),
+    'nesw-resize':  (12, 12, 1, static(glass(DOUBLE_ARROW, transform='rotate(-45 12 12)'))),
+    'col-resize':   (12, 12, 1, static(glass(SPLIT_ARROWS), glass(SPLIT_BAR))),
+    'row-resize':   (12, 12, 1, static(glass(SPLIT_ARROWS, transform='rotate(90 12 12)'),
+                                       glass(SPLIT_BAR, transform='rotate(90 12 12)'))),
+    'not-allowed':  (12, 12, 1, static(forbidden(12, 12, 7.6, 2.8))),
+    'help':         (3.5, 2, 1, static(ARROW_SVG, badge('blue', GLYPH_QUESTION))),
+    'copy':         (3.5, 2, 1, static(ARROW_SVG, badge('green', GLYPH_PLUS))),
+    'alias':        (3.5, 2, 1, static(ARROW_SVG, badge('blue', GLYPH_LINK))),
+    'context-menu': (3.5, 2, 1, static(ARROW_SVG, badge('smoke', GLYPH_MENU))),
+    'no-drop':      (3.5, 2, 1, static(ARROW_SVG, forbidden(17.6, 17.6, 3.6, 1.8))),
+    'zoom-in':      (10, 10, 1, static(magnifier(ZOOM_PLUS))),
+    'zoom-out':     (10, 10, 1, static(magnifier(ZOOM_MINUS))),
+    'wait':         (12, 12, FRAMES, lambda f: svg(ring(12, 12, 7.4, 3.2, 360 * f / FRAMES))),
+    'progress':     (3.5, 2, FRAMES, lambda f: svg(ARROW_SVG, ring(17.4, 17.4, 3.6, 2.2, 360 * f / FRAMES))),
+}
+
+# Other names that apps ask for: CSS names, then the legacy X11 ones
+ALIASES = {
+    'default': ['arrow', 'left_ptr', 'top_left_arrow', 'dnd-move', 'dnd-none'],
+    'pointer': ['hand1', 'hand2', 'pointing_hand'],
+    'grab': ['openhand'],
+    'grabbing': ['closedhand', 'dnd-grab'],
+    'text': ['xterm', 'ibeam'],
+    'crosshair': ['cross', 'tcross', 'cross_reverse', 'diamond_cross'],
+    'cell': ['plus'],
+    'all-scroll': ['move', 'all-resize', 'fleur', 'size_all'],
+    'ew-resize': ['e-resize', 'w-resize', 'left_side', 'right_side', 'sb_h_double_arrow',
+                  'h_double_arrow', 'size_hor'],
+    'ns-resize': ['n-resize', 's-resize', 'top_side', 'bottom_side', 'sb_v_double_arrow',
+                  'v_double_arrow', 'size_ver'],
+    'nwse-resize': ['nw-resize', 'se-resize', 'top_left_corner', 'bottom_right_corner',
+                    'bd_double_arrow', 'size_fdiag'],
+    'nesw-resize': ['ne-resize', 'sw-resize', 'top_right_corner', 'bottom_left_corner',
+                    'fd_double_arrow', 'size_bdiag'],
+    'col-resize': ['split_h'],
+    'row-resize': ['split_v'],
+    'not-allowed': ['X_cursor', 'crossed_circle', 'forbidden', 'circle'],
+    'help': ['question_arrow', 'whats_this', 'dnd-ask'],
+    'copy': ['dnd-copy'],
+    'alias': ['link', 'dnd-link'],
+    'wait': ['watch'],
+    'progress': ['left_ptr_watch', 'half-busy'],
+}
+
+
+def render(svg_text, size):
+    handle = Rsvg.Handle.new_from_data(svg_text.encode())
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, size, size)
+    ctx = cairo.Context(surface)
+    viewport = Rsvg.Rectangle()
+    viewport.x, viewport.y, viewport.width, viewport.height = 0, 0, size, size
+    handle.render_document(ctx, viewport)
+    surface.flush()
+    return surface
+
+
+def xcursor(images):
+    """images: list of (nominal size, surface, xhot, yhot, delay)."""
+    header = struct.pack('<4sIII', b'Xcur', 16, 0x10000, len(images))
+    toc, chunks = b'', b''
+    pos = 16 + 12 * len(images)
+    for size, surface, xhot, yhot, delay in images:
+        w, h = surface.get_width(), surface.get_height()
+        chunk = struct.pack('<9I', 36, 0xfffd0002, size, 1, w, h, xhot, yhot, delay)
+        chunk += bytes(surface.get_data())  # premultiplied ARGB, native endian
+        toc += struct.pack('<III', 0xfffd0002, size, pos)
+        chunks += chunk
+        pos += len(chunk)
+    return header + toc + chunks
+
+
+def build(out):
+    if os.path.isdir(out):
+        shutil.rmtree(out)
+    cursors = os.path.join(out, 'cursors')
+    os.makedirs(cursors)
+    with open(os.path.join(out, 'index.theme'), 'w') as f:
+        f.write('[Icon Theme]\nName=GNOME Glass Cursors\n'
+                'Comment=Glass cursors from GNOME Glass\nInherits=Adwaita\n')
+    for name, (hx, hy, frames, draw) in CURSORS.items():
+        images = []
+        for size in SIZES:
+            scale = size / 24
+            xhot = min(size - 1, round(hx * scale))
+            yhot = min(size - 1, round(hy * scale))
+            for frame in range(frames):
+                images.append((size, render(draw(frame), size), xhot, yhot,
+                               FRAME_DELAY if frames > 1 else 50))
+        with open(os.path.join(cursors, name), 'wb') as f:
+            f.write(xcursor(images))
+        for alias in ALIASES.get(name, []):
+            os.symlink(name, os.path.join(cursors, alias))
+
+
+PREVIEW = ['default', 'pointer', 'text', 'grab', 'grabbing', 'help', 'progress', 'wait',
+           'copy', 'alias', 'context-menu', 'not-allowed', 'crosshair', 'all-scroll',
+           'nwse-resize', 'col-resize', 'zoom-in']
+
+
+def preview(path, size=48, pad=16):
+    """A strip of cursors over a light and a dark band."""
+    w = len(PREVIEW) * (size + pad) + pad
+    h = 2 * (size + pad) + pad
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
+    ctx = cairo.Context(surface)
+    for i, (top, bottom) in enumerate((('#e9f1fb', '#cfe0f5'), ('#1d2433', '#0e1320'))):
+        y0 = i * h / 2
+        grad = cairo.LinearGradient(0, y0, 0, y0 + h / 2)
+        for stop, color in ((0, top), (1, bottom)):
+            grad.add_color_stop_rgb(stop, *(int(color[j:j + 2], 16) / 255 for j in (1, 3, 5)))
+        ctx.set_source(grad)
+        ctx.rectangle(0, y0, w, h / 2)
+        ctx.fill()
+        for j, name in enumerate(PREVIEW):
+            hx, hy, frames, draw = CURSORS[name]
+            ctx.set_source_surface(render(draw(frames // 8), size), pad + j * (size + pad), y0 + pad / 2)
+            ctx.paint()
+    surface.write_to_png(path)
+
+
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    preview_path = None
+    if '--preview' in args:
+        i = args.index('--preview')
+        preview_path = args[i + 1]
+        del args[i:i + 2]
+    build(args[0] if args else 'themes/GNOMEGlass-Cursors')
+    if preview_path:
+        preview(preview_path)

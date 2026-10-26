@@ -1,0 +1,986 @@
+@import url("resource:///org/gtk/libgtk/theme/Default/gtk-dark.css");
+
+:root {
+  --glass-bg: #eef2f7;
+  --glass-fg: #18202b;
+  --glass-fg-dim: #5b6474;
+  --glass-view-bg: #fbfcfe;
+  --glass-view-fg: #18202b;
+  --glass-card-bg: #ffffff;
+  --glass-card-border: rgba(16, 32, 64, 0.1);
+  --glass-sidebar-bg: #e6ecf4;
+  --glass-sidebar-fg: #18202b;
+  --glass-sidebar-backdrop: #ecf0f6;
+  --glass-sidebar-border: rgba(16, 32, 64, 0.1);
+  --glass-secondary-sidebar-bg: #edf1f7;
+  --glass-secondary-sidebar-backdrop: #f1f4f8;
+  --glass-popover-bg: #fbfcfe;
+  --glass-popover-fg: #18202b;
+  --glass-dialog-bg: #f4f7fb;
+  --glass-rim: rgba(255, 255, 255, 0.95);
+  --glass-edge: rgba(16, 32, 64, 0.14);
+  --glass-hairline: rgba(16, 32, 64, 0.1);
+  --glass-title-top: #fdfeff;
+  --glass-title-bottom: #e3e9f1;
+  --glass-title-backdrop: #eef1f5;
+  --glass-title-mid: #f0f4f8;
+  --glass-title-fg: #18202b;
+  --glass-title-tint: 14%;
+  --glass-orb-top: rgba(255, 255, 255, 0.95);
+  --glass-orb-bottom: rgba(255, 255, 255, 0.35);
+  --glass-btn-top: #ffffff;
+  --glass-btn-bottom: #edf1f6;
+  --glass-btn-edge: rgba(16, 32, 64, 0.17);
+  --glass-btn-fg: #18202b;
+  --glass-entry-bg: #ffffff;
+  --glass-entry-edge: rgba(16, 32, 64, 0.22);
+  --glass-trough: rgba(16, 32, 64, 0.12);
+  --glass-recess: rgba(16, 32, 64, 0.1);
+  --glass-ember-top: #ff8f7a;
+  --glass-ember: #e5483b;
+  --glass-ember-edge: #b3261b;
+  --glass-ember-glow: rgba(255, 92, 70, 0.55);
+  --glass-smoke: rgba(20, 24, 32, 0.8);
+  --glass-smoke-solid: #1c2029;
+  --glass-smoke-fg: #f4f7fb;
+  --glass-smoke-rim: rgba(255, 255, 255, 0.16);
+  --glass-success: #26a269;
+  --glass-error: #e5483b;
+  --glass-success-text: #1b8553;
+  --glass-warning-text: #9c6e03;
+  --glass-error-text: #c7271b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-bg: #181a20;
+    --glass-fg: #e8ecf3;
+    --glass-fg-dim: #9aa3b2;
+    --glass-view-bg: #15171d;
+    --glass-view-fg: #e8ecf3;
+    --glass-card-bg: #22262e;
+    --glass-card-border: rgba(255, 255, 255, 0.07);
+    --glass-sidebar-bg: #252932;
+    --glass-sidebar-fg: #e3e8f0;
+    --glass-sidebar-backdrop: #21242b;
+    --glass-sidebar-border: rgba(0, 0, 0, 0.35);
+    --glass-secondary-sidebar-bg: #1c1f27;
+    --glass-secondary-sidebar-backdrop: #1b1e24;
+    --glass-popover-bg: #262a33;
+    --glass-popover-fg: #eef1f6;
+    --glass-dialog-bg: #20232b;
+    --glass-rim: rgba(255, 255, 255, 0.11);
+    --glass-edge: rgba(0, 0, 0, 0.5);
+    --glass-hairline: rgba(255, 255, 255, 0.08);
+    --glass-title-top: #313642;
+    --glass-title-bottom: #22262e;
+    --glass-title-backdrop: #24272e;
+    --glass-title-mid: #2a2e38;
+    --glass-title-fg: #f0f3f8;
+    --glass-title-tint: 22%;
+    --glass-orb-top: rgba(255, 255, 255, 0.2);
+    --glass-orb-bottom: rgba(255, 255, 255, 0.05);
+    --glass-btn-top: #3b404c;
+    --glass-btn-bottom: #2c3039;
+    --glass-btn-edge: rgba(255, 255, 255, 0.1);
+    --glass-btn-fg: #eef1f6;
+    --glass-entry-bg: #121419;
+    --glass-entry-edge: rgba(255, 255, 255, 0.13);
+    --glass-trough: rgba(255, 255, 255, 0.12);
+    --glass-recess: rgba(0, 0, 0, 0.32);
+    --glass-ember-top: #ff8f7a;
+    --glass-ember: #e5483b;
+    --glass-ember-edge: #b3261b;
+    --glass-ember-glow: rgba(255, 92, 70, 0.55);
+    --glass-smoke: rgba(20, 24, 32, 0.8);
+    --glass-smoke-solid: #1c2029;
+    --glass-smoke-fg: #f4f7fb;
+    --glass-smoke-rim: rgba(255, 255, 255, 0.16);
+    --glass-success: #26a269;
+    --glass-error: #e5483b;
+    --glass-success-text: #57e389;
+    --glass-warning-text: #f8e45c;
+    --glass-error-text: #ff8a7e;
+  }
+}
+
+/*
+ * GNOME Glass — GTK 4 / libadwaita
+ *
+ * libadwaita apps ignore GTK themes; the only supported way to change how
+ * they look is ~/.config/gtk-4.0/gtk.css, which has user priority (it beats
+ * libadwaita regardless of specificity). That is why this file only touches
+ * what it needs and uses its own variables (--glass-*), so it also works in
+ * GTK4 apps without libadwaita.
+ *
+ * The --glass-* variables are not defined here: build.sh generates them from
+ * src/_palette.scss (through palette.scss) and puts them before this file,
+ * with the light values in :root and the dark ones in
+ * @media (prefers-color-scheme).
+ *
+ * The tint is libadwaita's --accent-bg-color, so the glass follows
+ * Settings → Appearance → Accent color. GTK4 apps without libadwaita get
+ * GNOME's default blue through the fallback in var().
+ */
+
+/* ------------------------------------------------------------------------ */
+/* libadwaita variables                                                     */
+/* ------------------------------------------------------------------------ */
+
+:root {
+  --glass-accent: var(--accent-bg-color, #3584e4);
+  --window-bg-color: var(--glass-bg);
+  --window-fg-color: var(--glass-fg);
+  --view-bg-color: var(--glass-view-bg);
+  --view-fg-color: var(--glass-view-fg);
+  --headerbar-bg-color: var(--glass-bg);
+  --headerbar-fg-color: var(--glass-title-fg);
+  --headerbar-backdrop-color: var(--glass-bg);
+  --headerbar-border-color: var(--glass-hairline);
+  --sidebar-bg-color: var(--glass-sidebar-bg);
+  --sidebar-fg-color: var(--glass-sidebar-fg);
+  --sidebar-backdrop-color: var(--glass-sidebar-backdrop);
+  --sidebar-border-color: var(--glass-sidebar-border);
+  --secondary-sidebar-bg-color: var(--glass-secondary-sidebar-bg);
+  --secondary-sidebar-fg-color: var(--glass-sidebar-fg);
+  --secondary-sidebar-backdrop-color: var(--glass-secondary-sidebar-backdrop);
+  --card-bg-color: var(--glass-card-bg);
+  --card-fg-color: var(--glass-fg);
+  --dialog-bg-color: var(--glass-dialog-bg);
+  --dialog-fg-color: var(--glass-fg);
+  --popover-bg-color: var(--glass-popover-bg);
+  --popover-fg-color: var(--glass-popover-fg);
+  --thumbnail-bg-color: var(--glass-card-bg);
+  --success-bg-color: var(--glass-success);
+  --success-color: var(--glass-success-text);
+  --warning-color: var(--glass-warning-text);
+  --error-bg-color: var(--glass-error);
+  --error-color: var(--glass-error-text);
+  --destructive-bg-color: var(--glass-ember);
+  --destructive-color: var(--glass-error-text);
+  --window-radius: 16px;
+}
+
+/* libadwaita squares the corners of maximized and tiled windows; our
+   :root value above has user priority, so repeat that here */
+window.csd.maximized,
+window.csd.fullscreen,
+window.csd.tiled,
+window.csd.tiled-top,
+window.csd.tiled-left,
+window.csd.tiled-right,
+window.csd.tiled-bottom,
+window.solid-csd {
+  --window-radius: 0px;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Title bar: accent-tinted glass with a caustic glow                       */
+/* ------------------------------------------------------------------------ */
+
+/*
+ * Three layers: a soft light spot in the top left corner (light hitting the
+ * glass), the vertical glass gradient tinted with the accent, and the solid
+ * fallback color. The rim on top and the hairline at the bottom are shadows.
+ */
+headerbar,
+toolbarview > .top-bar headerbar,
+toolbarview > .bottom-bar headerbar,
+headerbar.flat {
+  background-color: var(--glass-title-bottom);
+  background-image: radial-gradient(ellipse 60% 140% at 12% 0%,
+                                    rgb(255 255 255 / 22%), transparent),
+                    linear-gradient(to bottom,
+                                    color-mix(in srgb, var(--glass-accent) var(--glass-title-tint), var(--glass-title-top)),
+                                    color-mix(in srgb, var(--glass-accent) var(--glass-title-tint), var(--glass-title-bottom)));
+  color: var(--glass-title-fg);
+  box-shadow: inset 0 1px var(--glass-rim),
+              inset 0 -1px var(--glass-edge);
+}
+
+/* Inactive windows: the glass loses most of its tint, like Aero */
+headerbar:backdrop,
+toolbarview > .top-bar headerbar:backdrop,
+toolbarview > .bottom-bar headerbar:backdrop {
+  background-color: var(--glass-title-backdrop);
+  background-image: linear-gradient(to bottom,
+                                    color-mix(in srgb, var(--glass-accent) 4%, var(--glass-title-top)),
+                                    color-mix(in srgb, var(--glass-accent) 4%, var(--glass-title-backdrop)));
+}
+
+headerbar:backdrop > windowhandle {
+  filter: opacity(0.75);
+}
+
+/*
+ * When a toolbarview stacks more than one bar (headerbar + search bar, even
+ * a hidden one), libadwaita applies .collapse-spacing: 3px of padding on the
+ * container and a 40px headerbar. Since the gradient is on the headerbar,
+ * strips of the window color were left above and below it, and the bar was
+ * shorter than the one in the other pane (Files, Settings). Give the
+ * headerbar its normal height back.
+ */
+toolbarview > .top-bar .collapse-spacing,
+toolbarview > .bottom-bar .collapse-spacing {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+toolbarview > .top-bar .collapse-spacing headerbar:not(.default-decoration),
+toolbarview > .bottom-bar .collapse-spacing headerbar:not(.default-decoration) {
+  min-height: 46px;
+}
+
+toolbarview > .top-bar .collapse-spacing headerbar:not(.default-decoration) > windowhandle > box,
+toolbarview > .bottom-bar .collapse-spacing headerbar:not(.default-decoration) > windowhandle > box {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+toolbarview > .top-bar .collapse-spacing searchbar > revealer > box {
+  padding-bottom: 6px;
+}
+
+headerbar .title,
+windowtitle .title {
+  font-weight: 700;
+}
+
+/* Entries in the title bar: clear glass wells */
+headerbar entry,
+headerbar spinbutton,
+headerbar searchbar entry {
+  background-color: color-mix(in srgb, var(--glass-entry-bg) 70%, transparent);
+  color: var(--glass-view-fg);
+}
+
+/*
+ * Window controls: round glass orbs; close is an "ember" orb, red with a
+ * warm glow. Hovering lights the orb from below.
+ */
+windowcontrols > button > image {
+  border-radius: 999px;
+  padding: 4px;
+  color: var(--glass-title-fg);
+  background-color: transparent;
+  background-image: linear-gradient(to bottom, var(--glass-orb-top), var(--glass-orb-bottom));
+  box-shadow: inset 0 0 0 1px var(--glass-btn-edge),
+              0 1px 2px rgb(0 0 0 / 14%);
+}
+
+windowcontrols > button:hover > image {
+  background-image: radial-gradient(circle at 50% 110%,
+                                    color-mix(in srgb, var(--glass-accent) 70%, transparent),
+                                    transparent 75%),
+                    linear-gradient(to bottom, var(--glass-orb-top), var(--glass-orb-bottom));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 55%, transparent),
+              0 0 6px color-mix(in srgb, var(--glass-accent) 45%, transparent);
+}
+
+windowcontrols > button:active > image {
+  background-image: linear-gradient(to bottom, var(--glass-orb-bottom), var(--glass-orb-top));
+}
+
+windowcontrols > button.close > image {
+  color: #ffffff;
+  background-color: var(--glass-ember);
+  background-image: linear-gradient(to bottom, var(--glass-ember-top), var(--glass-ember) 60%);
+  box-shadow: inset 0 0 0 1px var(--glass-ember-edge),
+              inset 0 1px rgb(255 255 255 / 45%),
+              0 1px 2px rgb(0 0 0 / 18%);
+  -gtk-icon-shadow: 0 1px rgb(0 0 0 / 30%);
+}
+
+windowcontrols > button.close:hover > image {
+  background-image: radial-gradient(ellipse 80% 70% at 50% 110%, rgb(255 210 160 / 75%), transparent),
+                    linear-gradient(to bottom, var(--glass-ember-top), var(--glass-ember) 60%);
+  box-shadow: inset 0 0 0 1px var(--glass-ember-edge),
+              inset 0 1px rgb(255 255 255 / 55%),
+              0 0 10px var(--glass-ember-glow);
+}
+
+windowcontrols > button.close:active > image {
+  background-image: linear-gradient(to bottom, var(--glass-ember), var(--glass-ember-top));
+}
+
+windowcontrols > button:backdrop:not(:hover) > image {
+  filter: saturate(0.25) opacity(0.7);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Buttons: glass, lit from below on hover                                  */
+/* ------------------------------------------------------------------------ */
+
+/*
+ * Specificity matters here, because every rule in this file has user
+ * priority. The title bar and toolbar rules repeat the generic selectors with
+ * an ancestor in front, so they always win over the generic ones.
+ */
+button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card),
+button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card),
+button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card),
+:not(splitbutton) > menubutton:not(.flat) > button,
+splitbutton:not(.flat) > button,
+splitbutton:not(.flat) > menubutton > button,
+dropdown > button:not(.flat),
+combobox > box > button:not(.flat),
+spinbutton > button {
+  background-image: linear-gradient(to bottom, var(--glass-btn-top), var(--glass-btn-bottom));
+  color: var(--glass-btn-fg);
+  box-shadow: inset 0 0 0 1px var(--glass-btn-edge),
+              inset 0 1px var(--glass-rim),
+              0 1px 2px rgb(0 0 0 / 6%);
+}
+
+button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):hover,
+button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):hover,
+button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):hover,
+:not(splitbutton) > menubutton:not(.flat) > button:hover,
+splitbutton:not(.flat) > button:hover,
+splitbutton:not(.flat) > menubutton > button:hover,
+dropdown > button:not(.flat):hover,
+combobox > box > button:not(.flat):hover,
+spinbutton > button:hover {
+  background-image: radial-gradient(ellipse 90% 80% at 50% 120%,
+                                    color-mix(in srgb, var(--glass-accent) 35%, transparent),
+                                    transparent),
+                    linear-gradient(to bottom, var(--glass-btn-top), var(--glass-btn-bottom));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 45%, var(--glass-btn-edge)),
+              inset 0 1px var(--glass-rim),
+              0 1px 3px rgb(0 0 0 / 8%);
+}
+
+button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):active,
+button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):active,
+button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):active,
+:not(splitbutton) > menubutton:not(.flat) > button:active,
+splitbutton:not(.flat) > button:active,
+splitbutton:not(.flat) > menubutton > button:active,
+dropdown > button:not(.flat):active,
+combobox > box > button:not(.flat):active,
+spinbutton > button:active {
+  background-image: linear-gradient(to bottom, var(--glass-btn-bottom), var(--glass-btn-top));
+  box-shadow: inset 0 0 0 1px var(--glass-btn-edge),
+              inset 0 1px 3px rgb(0 0 0 / 12%);
+}
+
+/* Checked toggle buttons: accent-tinted glass */
+button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):checked,
+button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):checked,
+button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):checked,
+:not(splitbutton) > menubutton:not(.flat) > button:checked,
+splitbutton:not(.flat) > button:checked,
+splitbutton:not(.flat) > menubutton > button:checked,
+dropdown > button:not(.flat):checked,
+combobox > box > button:not(.flat):checked,
+spinbutton > button:checked {
+  background-color: color-mix(in srgb, var(--glass-accent) 24%, var(--glass-btn-bottom));
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 18%), transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 55%, transparent),
+              inset 0 1px 2px rgb(0 0 0 / 10%);
+}
+
+/* In title bars, toolbars and toasts buttons stay flat, like in libadwaita */
+headerbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised),
+headerbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised),
+headerbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised),
+headerbar :not(splitbutton) > menubutton:not(.flat) > button,
+headerbar splitbutton:not(.flat) > button,
+headerbar splitbutton:not(.flat) > menubutton > button,
+headerbar dropdown > button:not(.flat),
+headerbar combobox > box > button:not(.flat),
+headerbar spinbutton > button,
+.toolbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised),
+toast button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised),
+.toolbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised),
+toast button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised),
+.toolbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised),
+toast button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised),
+.toolbar :not(splitbutton) > menubutton:not(.flat) > button,
+toast :not(splitbutton) > menubutton:not(.flat) > button,
+.toolbar splitbutton:not(.flat) > button,
+toast splitbutton:not(.flat) > button,
+.toolbar splitbutton:not(.flat) > menubutton > button,
+toast splitbutton:not(.flat) > menubutton > button,
+.toolbar dropdown > button:not(.flat),
+toast dropdown > button:not(.flat),
+.toolbar combobox > box > button:not(.flat),
+toast combobox > box > button:not(.flat),
+.toolbar spinbutton > button,
+toast spinbutton > button {
+  background-image: none;
+  box-shadow: none;
+  color: inherit;
+}
+
+/* ...and hovering shows a glass bubble */
+headerbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):hover,
+headerbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):hover,
+headerbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):hover,
+headerbar :not(splitbutton) > menubutton:not(.flat) > button:hover,
+headerbar splitbutton:not(.flat) > button:hover,
+headerbar splitbutton:not(.flat) > menubutton > button:hover,
+headerbar dropdown > button:not(.flat):hover,
+headerbar combobox > box > button:not(.flat):hover,
+headerbar spinbutton > button:hover,
+.toolbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):hover,
+toast button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):hover,
+.toolbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):hover,
+toast button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):hover,
+.toolbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):hover,
+toast button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):hover,
+.toolbar :not(splitbutton) > menubutton:not(.flat) > button:hover,
+toast :not(splitbutton) > menubutton:not(.flat) > button:hover,
+.toolbar splitbutton:not(.flat) > button:hover,
+toast splitbutton:not(.flat) > button:hover,
+.toolbar splitbutton:not(.flat) > menubutton > button:hover,
+toast splitbutton:not(.flat) > menubutton > button:hover,
+.toolbar dropdown > button:not(.flat):hover,
+toast dropdown > button:not(.flat):hover,
+.toolbar combobox > box > button:not(.flat):hover,
+toast combobox > box > button:not(.flat):hover,
+.toolbar spinbutton > button:hover,
+toast spinbutton > button:hover {
+  background-color: transparent;
+  background-image: radial-gradient(ellipse 90% 80% at 50% 120%,
+                                    color-mix(in srgb, var(--glass-accent) 22%, transparent),
+                                    transparent),
+                    linear-gradient(to bottom, rgb(255 255 255 / 45%), rgb(255 255 255 / 12%));
+  box-shadow: inset 0 0 0 1px var(--glass-btn-edge),
+              inset 0 1px var(--glass-rim);
+}
+
+headerbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):active,
+headerbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):active,
+headerbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):active,
+headerbar :not(splitbutton) > menubutton:not(.flat) > button:active,
+headerbar splitbutton:not(.flat) > button:active,
+headerbar splitbutton:not(.flat) > menubutton > button:active,
+headerbar dropdown > button:not(.flat):active,
+headerbar combobox > box > button:not(.flat):active,
+headerbar spinbutton > button:active,
+.toolbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):active,
+toast button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):active,
+.toolbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):active,
+toast button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):active,
+.toolbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):active,
+toast button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):active,
+.toolbar :not(splitbutton) > menubutton:not(.flat) > button:active,
+toast :not(splitbutton) > menubutton:not(.flat) > button:active,
+.toolbar splitbutton:not(.flat) > button:active,
+toast splitbutton:not(.flat) > button:active,
+.toolbar splitbutton:not(.flat) > menubutton > button:active,
+toast splitbutton:not(.flat) > menubutton > button:active,
+.toolbar dropdown > button:not(.flat):active,
+toast dropdown > button:not(.flat):active,
+.toolbar combobox > box > button:not(.flat):active,
+toast combobox > box > button:not(.flat):active,
+.toolbar spinbutton > button:active,
+toast spinbutton > button:active,
+headerbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):checked,
+headerbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):checked,
+headerbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):checked,
+headerbar :not(splitbutton) > menubutton:not(.flat) > button:checked,
+headerbar splitbutton:not(.flat) > button:checked,
+headerbar splitbutton:not(.flat) > menubutton > button:checked,
+headerbar dropdown > button:not(.flat):checked,
+headerbar combobox > box > button:not(.flat):checked,
+headerbar spinbutton > button:checked,
+.toolbar button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):checked,
+toast button.text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.link):not(.card):not(.raised):checked,
+.toolbar button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):checked,
+toast button.image-text-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):checked,
+.toolbar button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):checked,
+toast button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):checked,
+.toolbar :not(splitbutton) > menubutton:not(.flat) > button:checked,
+toast :not(splitbutton) > menubutton:not(.flat) > button:checked,
+.toolbar splitbutton:not(.flat) > button:checked,
+toast splitbutton:not(.flat) > button:checked,
+.toolbar splitbutton:not(.flat) > menubutton > button:checked,
+toast splitbutton:not(.flat) > menubutton > button:checked,
+.toolbar dropdown > button:not(.flat):checked,
+toast dropdown > button:not(.flat):checked,
+.toolbar combobox > box > button:not(.flat):checked,
+toast combobox > box > button:not(.flat):checked,
+.toolbar spinbutton > button:checked,
+toast spinbutton > button:checked {
+  background-color: color-mix(in srgb, var(--glass-accent) 22%, transparent);
+  background-image: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 40%, transparent),
+              inset 0 1px 2px rgb(0 0 0 / 10%);
+}
+
+/* Window controls draw their glass on the image, never on the button */
+headerbar windowcontrols > button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised),
+headerbar windowcontrols > button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):hover,
+headerbar windowcontrols > button.image-button:not(.flat):not(.suggested-action):not(.destructive-action):not(.osd):not(.card):not(.raised):active {
+  background: none;
+  box-shadow: none;
+}
+
+spinbutton.vertical > button,
+spinbutton > button.flat {
+  background-image: none;
+  box-shadow: none;
+}
+
+/* Suggested: liquid accent glass with a soft glow */
+button.suggested-action,
+button.default {
+  background-color: var(--glass-accent);
+  background-image: linear-gradient(to bottom,
+                                    color-mix(in srgb, white 30%, var(--glass-accent)),
+                                    var(--glass-accent) 55%,
+                                    color-mix(in srgb, black 10%, var(--glass-accent)));
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, black 22%, var(--glass-accent)),
+              inset 0 1px rgb(255 255 255 / 45%),
+              0 2px 8px color-mix(in srgb, var(--glass-accent) 30%, transparent);
+}
+
+button.suggested-action:hover,
+button.default:hover {
+  background-image: radial-gradient(ellipse 90% 80% at 50% 120%, rgb(255 255 255 / 30%), transparent),
+                    linear-gradient(to bottom,
+                                    color-mix(in srgb, white 40%, var(--glass-accent)),
+                                    color-mix(in srgb, white 8%, var(--glass-accent)) 55%,
+                                    var(--glass-accent));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, black 22%, var(--glass-accent)),
+              inset 0 1px rgb(255 255 255 / 55%),
+              0 2px 12px color-mix(in srgb, var(--glass-accent) 45%, transparent);
+}
+
+button.destructive-action {
+  background-color: var(--glass-ember);
+  background-image: linear-gradient(to bottom, var(--glass-ember-top), var(--glass-ember) 60%);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px var(--glass-ember-edge),
+              inset 0 1px rgb(255 255 255 / 40%),
+              0 2px 8px color-mix(in srgb, var(--glass-ember) 25%, transparent);
+}
+
+button.destructive-action:hover {
+  background-image: radial-gradient(ellipse 90% 80% at 50% 120%, rgb(255 210 160 / 45%), transparent),
+                    linear-gradient(to bottom, var(--glass-ember-top), var(--glass-ember) 60%);
+  box-shadow: inset 0 0 0 1px var(--glass-ember-edge),
+              inset 0 1px rgb(255 255 255 / 50%),
+              0 2px 12px var(--glass-ember-glow);
+}
+
+button.suggested-action:active,
+button.default:active,
+button.destructive-action:active {
+  filter: brightness(0.92);
+}
+
+button.suggested-action:disabled,
+button.destructive-action:disabled {
+  filter: saturate(0.3) opacity(0.6);
+  box-shadow: none;
+}
+
+/* Flat buttons: a faint glass bubble on hover */
+button.flat:hover:not(:checked):not(:active):not(.osd):not(.link):not(.minimize):not(.maximize):not(.close) {
+  background-image: linear-gradient(to bottom,
+                                    color-mix(in srgb, var(--glass-btn-top) 55%, transparent),
+                                    color-mix(in srgb, var(--glass-btn-bottom) 30%, transparent));
+  box-shadow: inset 0 0 0 1px var(--glass-hairline);
+}
+
+/*
+ * Toggle groups (libadwaita 1.7+): the active item is a raised glass pane
+ * sliding in a recessed trough.
+ */
+toggle-group:not(.flat) {
+  background-color: var(--glass-recess);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+toggle-group:not(.flat) > toggle:checked {
+  background-color: var(--glass-btn-bottom);
+  background-image: linear-gradient(to bottom, var(--glass-btn-top), var(--glass-btn-bottom));
+  color: var(--glass-btn-fg);
+  box-shadow: inset 0 1px var(--glass-rim),
+              0 0 0 1px var(--glass-btn-edge),
+              0 1px 3px rgb(0 0 0 / 14%);
+}
+
+toggle-group:not(.flat) > toggle:hover:not(:checked) {
+  background-color: color-mix(in srgb, var(--glass-accent) 10%, transparent);
+}
+
+/* Buttons over images and video (.osd): smoked glass */
+button.osd {
+  background-color: var(--glass-smoke);
+  color: var(--glass-smoke-fg);
+  box-shadow: inset 0 1px var(--glass-smoke-rim);
+}
+
+button.osd:hover {
+  background-color: color-mix(in srgb, white 12%, var(--glass-smoke-solid));
+}
+
+button.osd:active,
+button.osd:checked {
+  background-color: color-mix(in srgb, var(--glass-accent) 45%, var(--glass-smoke-solid));
+}
+
+/* ------------------------------------------------------------------------ */
+/* Entries: glass wells                                                     */
+/* ------------------------------------------------------------------------ */
+
+entry,
+spinbutton,
+searchbar entry {
+  background-color: var(--glass-entry-bg);
+  color: var(--glass-view-fg);
+  box-shadow: inset 0 0 0 1px var(--glass-entry-edge),
+              inset 0 1px 2px rgb(0 0 0 / 7%);
+  border-radius: 10px;
+}
+
+entry:focus-within,
+spinbutton:focus-within {
+  box-shadow: inset 0 0 0 1px var(--glass-accent),
+              0 0 0 3px color-mix(in srgb, var(--glass-accent) 22%, transparent);
+  outline-color: transparent;
+}
+
+entry.error,
+entry.error:focus-within {
+  box-shadow: inset 0 0 0 1px var(--glass-error),
+              0 0 0 3px color-mix(in srgb, var(--glass-error) 22%, transparent);
+}
+
+/* Spin rows live inside lists: keep their spinbutton borderless */
+row.spin spinbutton,
+row.spin spinbutton:focus-within {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Checkboxes, radios and switches                                          */
+/* ------------------------------------------------------------------------ */
+
+check,
+radio {
+  background-color: var(--glass-entry-bg);
+  background-image: linear-gradient(to bottom, rgb(0 0 0 / 4%), transparent);
+  box-shadow: inset 0 0 0 1px var(--glass-entry-edge);
+}
+
+check {
+  border-radius: 6px;
+}
+
+check:hover:not(:checked):not(:indeterminate),
+radio:hover:not(:checked) {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 60%, transparent),
+              0 0 0 3px color-mix(in srgb, var(--glass-accent) 15%, transparent);
+}
+
+check:checked,
+check:indeterminate,
+radio:checked {
+  background-color: var(--glass-accent);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 32%), transparent 70%);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, black 20%, var(--glass-accent)),
+              inset 0 1px rgb(255 255 255 / 40%);
+}
+
+switch {
+  background-color: var(--glass-trough);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 14%);
+}
+
+switch:checked {
+  background-color: var(--glass-accent);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 22%), transparent 60%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, black 18%, var(--glass-accent)),
+              inset 0 1px 2px rgb(0 0 0 / 12%);
+}
+
+switch > slider {
+  background-color: #ffffff;
+  background-image: linear-gradient(to bottom, #ffffff, #e9eef5);
+  box-shadow: inset 0 -1px rgb(0 0 0 / 6%),
+              0 1px 3px rgb(0 0 0 / 30%),
+              0 0 0 1px rgb(0 0 0 / 6%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Progress bars (with the shimmer), sliders, level bars                    */
+/* ------------------------------------------------------------------------ */
+
+progressbar > trough {
+  background-color: var(--glass-trough);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
+}
+
+/*
+ * A band of light sweeps across the bar every few seconds, a nod to the Aero
+ * progress bar. GTK stops CSS animations when animations are turned off.
+ */
+@keyframes glass-shimmer {
+  from { background-position: -150% 0, 0 0; }
+  to   { background-position: 250% 0, 0 0; }
+}
+
+progressbar:not(.osd) > trough > progress {
+  background-color: var(--glass-accent);
+  background-image: linear-gradient(to right, transparent, rgb(255 255 255 / 45%), transparent),
+                    linear-gradient(to bottom, rgb(255 255 255 / 35%), transparent 60%);
+  background-size: 60% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, black 15%, var(--glass-accent));
+  animation: glass-shimmer 2.8s ease-in-out infinite;
+}
+
+progressbar.osd > trough > progress {
+  background-color: var(--glass-accent);
+}
+
+scale > trough {
+  background-color: var(--glass-trough);
+}
+
+scale > trough > highlight {
+  background-color: var(--glass-accent);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 30%), transparent);
+}
+
+scale > trough > slider {
+  background-color: #ffffff;
+  background-image: linear-gradient(to bottom, #ffffff, #e9eef5);
+  box-shadow: inset 0 -1px rgb(0 0 0 / 6%),
+              0 0 0 1px rgb(0 0 0 / 8%),
+              0 1px 3px rgb(0 0 0 / 28%);
+}
+
+scale > trough > slider:hover {
+  box-shadow: inset 0 -1px rgb(0 0 0 / 6%),
+              0 0 0 1px color-mix(in srgb, var(--glass-accent) 60%, transparent),
+              0 0 0 4px color-mix(in srgb, var(--glass-accent) 18%, transparent),
+              0 1px 3px rgb(0 0 0 / 28%);
+}
+
+levelbar > trough > block.filled {
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 28%), transparent);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Tabs and view switchers                                                  */
+/* ------------------------------------------------------------------------ */
+
+/* The active tab is a raised pane of glass */
+tabbar tab:selected {
+  background-color: var(--glass-btn-bottom);
+  background-image: linear-gradient(to bottom, var(--glass-btn-top), var(--glass-btn-bottom));
+  box-shadow: inset 0 1px var(--glass-rim),
+              0 0 0 1px var(--glass-btn-edge),
+              0 1px 3px rgb(0 0 0 / 10%);
+}
+
+tabbar tab:hover:not(:selected) {
+  background-color: color-mix(in srgb, var(--glass-accent) 8%, transparent);
+}
+
+notebook > header > tabs > tab:checked {
+  box-shadow: inset 0 -3px var(--glass-accent);
+}
+
+viewswitcher button.toggle:checked {
+  background-color: color-mix(in srgb, var(--glass-accent) 18%, transparent);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 20%), transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 35%, transparent),
+              inset 0 1px var(--glass-rim);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Popovers and menus                                                       */
+/* ------------------------------------------------------------------------ */
+
+popover > contents {
+  background-image: linear-gradient(to bottom,
+                                    color-mix(in srgb, var(--glass-accent) 5%, var(--glass-popover-bg)),
+                                    var(--glass-popover-bg) 80px);
+  box-shadow: inset 0 1px var(--glass-rim),
+              0 0 0 1px var(--glass-edge),
+              0 6px 20px rgb(0 0 0 / 18%);
+  border-radius: 16px;
+}
+
+popover > arrow {
+  box-shadow: 0 0 0 1px var(--glass-edge);
+}
+
+popover.menu modelbutton {
+  border-radius: 9px;
+}
+
+popover.menu modelbutton:hover,
+popover.menu modelbutton:selected,
+popover.menu modelbutton:focus-visible {
+  background-color: color-mix(in srgb, var(--glass-accent) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 22%, transparent);
+}
+
+popover.menu modelbutton:active {
+  background-color: var(--glass-accent);
+  color: #ffffff;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Dialogs: a glass sheet with an accent glow on top                        */
+/* ------------------------------------------------------------------------ */
+
+dialog-host > dialog.alert sheet,
+dialog-host > dialog sheet,
+window.dialog-window.alert.csd,
+window.messagedialog.csd {
+  background-image: linear-gradient(to bottom,
+                                    color-mix(in srgb, var(--glass-accent) 12%, var(--glass-dialog-bg)),
+                                    var(--glass-dialog-bg) 140px);
+}
+
+/* The user rule replaces the libadwaita shadow, so it is repeated here */
+dialog-host > dialog.alert sheet,
+window.dialog-window.alert.csd,
+window.messagedialog.csd {
+  border-radius: 22px;
+  box-shadow: inset 0 1px var(--glass-rim),
+              0 0 0 1px var(--glass-edge),
+              0 0 14px 2px rgb(0 0 6 / 4%),
+              0 6px 24px rgb(0 0 6 / 18%);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Lists, cards and sidebar                                                 */
+/* ------------------------------------------------------------------------ */
+
+.boxed-list,
+.boxed-list-separate > row,
+.card {
+  box-shadow: inset 0 1px var(--glass-rim),
+              0 0 0 1px var(--glass-card-border),
+              0 1px 4px rgb(0 0 0 / 5%);
+}
+
+/*
+ * The sidebar floats: an inset pane of glass with rounded corners, holding
+ * its own header. Around it runs a 6px frame of the title bar glass, which
+ * joins the title bar of the content.
+ *
+ * The frame is two solid shadows spread by 6px and shifted 16px up and
+ * down. Together they have straight edges along the whole window, so there
+ * is no gap at the corner where the frame meets the content's title bar;
+ * their rounded ends fall outside the window and are clipped.
+ */
+.sidebar-pane {
+  margin: 6px;
+  border-radius: 10px;
+  background-color: var(--glass-sidebar-bg);
+  background-image: linear-gradient(to bottom,
+                                    color-mix(in srgb, var(--glass-accent) 6%, var(--glass-sidebar-bg)),
+                                    var(--glass-sidebar-bg) 50%);
+  box-shadow: inset 0 1px var(--glass-rim),
+              0 0 0 1px var(--glass-edge),
+              0 -16px 0 6px color-mix(in srgb, var(--glass-accent) var(--glass-title-tint), var(--glass-title-mid)),
+              0 16px 0 6px color-mix(in srgb, var(--glass-accent) var(--glass-title-tint), var(--glass-title-mid));
+}
+
+.sidebar-pane:backdrop {
+  box-shadow: inset 0 1px var(--glass-rim),
+              0 0 0 1px var(--glass-edge),
+              0 -16px 0 6px color-mix(in srgb, var(--glass-accent) 4%, var(--glass-title-backdrop)),
+              0 16px 0 6px color-mix(in srgb, var(--glass-accent) 4%, var(--glass-title-backdrop));
+}
+
+/* Next to the frame, the content's title bar has no light spot in its corner */
+.content-pane headerbar:not(:backdrop),
+.content-pane toolbarview > .top-bar headerbar:not(:backdrop) {
+  background-image: linear-gradient(to bottom,
+                                    color-mix(in srgb, var(--glass-accent) var(--glass-title-tint), var(--glass-title-top)),
+                                    color-mix(in srgb, var(--glass-accent) var(--glass-title-tint), var(--glass-title-bottom)));
+}
+
+/*
+ * The pane starts 6px below the top of the window: move its header content
+ * up by the same amount, so its title lines up with the content's title.
+ */
+.sidebar-pane headerbar > windowhandle > box {
+  padding-top: 0;
+  padding-bottom: 12px;
+}
+
+/* Inside the floating pane the header is part of the glass */
+.sidebar-pane headerbar,
+.sidebar-pane toolbarview > .top-bar headerbar,
+.sidebar-pane headerbar:backdrop {
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+}
+
+/* The selected row is a tinted pane of glass, not a solid block */
+.navigation-sidebar > row:selected,
+.navigation-sidebar > row:selected:hover,
+listview.navigation-sidebar > row:selected {
+  background-color: color-mix(in srgb, var(--glass-accent) 20%, transparent);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 22%), transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glass-accent) 35%, transparent),
+              inset 0 1px var(--glass-rim);
+}
+
+.navigation-sidebar > row:hover:not(:selected) {
+  background-color: color-mix(in srgb, var(--glass-accent) 8%, transparent);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Tooltips and toasts: smoked glass                                        */
+/* ------------------------------------------------------------------------ */
+
+tooltip.background,
+tooltip {
+  background-color: var(--glass-smoke);
+  color: var(--glass-smoke-fg);
+  border-radius: 10px;
+  box-shadow: inset 0 1px var(--glass-smoke-rim);
+}
+
+tooltip > * {
+  color: var(--glass-smoke-fg);
+}
+
+toast {
+  background-color: var(--glass-smoke);
+  color: var(--glass-smoke-fg);
+  box-shadow: inset 0 1px var(--glass-smoke-rim),
+              0 4px 14px rgb(0 0 0 / 25%);
+}
+
+banner > revealer > widget {
+  background-color: color-mix(in srgb, var(--glass-accent) 16%, var(--glass-bg));
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 18%), transparent);
+  box-shadow: inset 0 -1px var(--glass-hairline);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Text selection and scrolling                                             */
+/* ------------------------------------------------------------------------ */
+
+selection,
+text > selection,
+label > selection {
+  background-color: color-mix(in srgb, var(--glass-accent) 32%, transparent);
+}
+
+scrollbar > range > trough > slider {
+  background-color: color-mix(in srgb, var(--glass-fg) 35%, transparent);
+}
+
+scrollbar > range > trough > slider:hover {
+  background-color: color-mix(in srgb, var(--glass-accent) 65%, transparent);
+}

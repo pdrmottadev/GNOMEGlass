@@ -1,0 +1,413 @@
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained.css");
+@define-color theme_bg_color #eef2f7;
+@define-color theme_fg_color #18202b;
+@define-color theme_base_color #fbfcfe;
+@define-color theme_text_color #18202b;
+@define-color theme_selected_bg_color #3584e4;
+@define-color theme_selected_fg_color #ffffff;
+@define-color accent_bg_color #3584e4;
+@define-color accent_fg_color #ffffff;
+@define-color accent_color #1c6fd1;
+window.background,
+.background {
+  background-color: #eef2f7;
+  color: #18202b;
+}
+
+.view,
+textview text,
+iconview,
+treeview.view {
+  background-color: #fbfcfe;
+  color: #18202b;
+}
+
+.view:selected,
+treeview.view:selected,
+iconview:selected,
+row:selected,
+*:selected {
+  background-color: #3584e4;
+  color: #ffffff;
+}
+
+selection,
+*:selected selection {
+  background-color: #3584e4;
+  color: #ffffff;
+}
+
+headerbar,
+.titlebar:not(headerbar),
+.titlebar headerbar {
+  background-color: #cbdbef;
+  background-image: radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.22), transparent 55%), linear-gradient(to bottom, #e1edfb, #cbdbef);
+  color: #18202b;
+  border-color: rgba(16, 32, 64, 0.14);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.95);
+}
+
+headerbar:backdrop,
+.titlebar:not(headerbar):backdrop {
+  background-image: linear-gradient(to bottom, #f5f9fe, #e7edf4);
+  color: rgba(24, 32, 43, 0.75);
+}
+
+headerbar .title {
+  font-weight: 700;
+  color: #18202b;
+}
+
+headerbar .subtitle {
+  color: rgba(24, 32, 43, 0.75);
+}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.link):not(.osd) {
+  background-image: none;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: #18202b;
+  text-shadow: none;
+  -gtk-icon-shadow: none;
+}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.link):not(.osd):hover {
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.12));
+  border-color: rgba(16, 32, 64, 0.17);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.95);
+}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.link):not(.osd):active,
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.link):not(.osd):checked {
+  background-color: rgba(53, 132, 228, 0.22);
+  background-image: none;
+  border-color: rgba(53, 132, 228, 0.4);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  color: #18202b;
+}
+
+headerbar entry {
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #18202b;
+}
+
+headerbar button.titlebutton:not(.appmenu) {
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  margin: 0 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 32, 64, 0.17);
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.35));
+  color: #18202b;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+  -gtk-icon-shadow: none;
+}
+
+headerbar button.titlebutton:not(.appmenu):hover {
+  background-image: radial-gradient(circle at bottom, rgba(53, 132, 228, 0.7), transparent 75%), linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.35));
+  border-color: rgba(53, 132, 228, 0.55);
+  box-shadow: 0 0 6px rgba(53, 132, 228, 0.45);
+}
+
+headerbar button.titlebutton:not(.appmenu):active {
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.95));
+}
+
+headerbar button.titlebutton:not(.appmenu).close {
+  border-color: #b3261b;
+  background-image: linear-gradient(to bottom, #ff8f7a, #e5483b 60%);
+  color: #ffffff;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.45), 0 1px 2px rgba(0, 0, 0, 0.18);
+  -gtk-icon-shadow: 0 1px rgba(0, 0, 0, 0.3);
+}
+
+headerbar button.titlebutton:not(.appmenu).close:hover {
+  background-image: radial-gradient(ellipse at bottom, rgba(255, 210, 160, 0.75), transparent 70%), linear-gradient(to bottom, #ff8f7a, #e5483b 60%);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.55), 0 0 10px rgba(255, 92, 70, 0.55);
+}
+
+headerbar button.titlebutton:not(.appmenu):backdrop {
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+button:not(.flat):not(.titlebutton):not(.suggested-action):not(.destructive-action):not(.link),
+combobox button,
+spinbutton button {
+  background-image: linear-gradient(to bottom, #ffffff, #edf1f6);
+  color: #18202b;
+  border: 1px solid rgba(16, 32, 64, 0.17);
+  border-radius: 8px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.95), 0 1px 2px rgba(0, 0, 0, 0.06);
+  text-shadow: none;
+  -gtk-icon-shadow: none;
+}
+
+button:not(.flat):not(.titlebutton):not(.suggested-action):not(.destructive-action):not(.link):hover,
+combobox button:hover,
+spinbutton button:hover {
+  background-image: radial-gradient(ellipse at bottom, rgba(53, 132, 228, 0.35), transparent 70%), linear-gradient(to bottom, #ffffff, #edf1f6);
+  border-color: #88b5ec;
+}
+
+button:not(.flat):not(.titlebutton):not(.suggested-action):not(.destructive-action):not(.link):active,
+button:not(.flat):not(.titlebutton):not(.suggested-action):not(.destructive-action):not(.link):checked {
+  background-image: linear-gradient(to bottom, #ccddf3, #e7f0fc);
+  border-color: rgba(53, 132, 228, 0.55);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+button:not(.flat):not(.titlebutton):disabled {
+  background-image: none;
+  background-color: #edf1f6;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+spinbutton button {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+button.suggested-action,
+button.default {
+  background-image: linear-gradient(to bottom, #72a9ec, #3584e4 55%, #1f76e1);
+  color: #ffffff;
+  border: 1px solid #1a66c2;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.45), 0 2px 6px rgba(53, 132, 228, 0.3);
+  text-shadow: none;
+  -gtk-icon-shadow: none;
+  border-radius: 8px;
+}
+
+button.suggested-action:hover,
+button.default:hover {
+  background-image: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.3), transparent 70%), linear-gradient(to bottom, #86b5ef, #458ee6 55%, #3584e4);
+}
+
+button.destructive-action {
+  background-image: linear-gradient(to bottom, #ff8f7a, #e5483b 60%);
+  color: #ffffff;
+  border: 1px solid #b3261b;
+  border-radius: 8px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.4);
+  text-shadow: none;
+}
+
+button.destructive-action:hover {
+  background-image: radial-gradient(ellipse at bottom, rgba(255, 210, 160, 0.45), transparent 70%), linear-gradient(to bottom, #ff8f7a, #e5483b 60%);
+}
+
+entry,
+spinbutton:not(.vertical) {
+  background-color: #ffffff;
+  color: #18202b;
+  border: 1px solid rgba(16, 32, 64, 0.22);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.07);
+}
+
+entry:focus,
+spinbutton:focus {
+  border-color: #3584e4;
+  box-shadow: inset 0 0 0 1px #3584e4;
+}
+
+spinbutton entry {
+  border: none;
+  box-shadow: none;
+}
+
+check,
+radio {
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.04), transparent);
+  background-color: #ffffff;
+  border: 1px solid rgba(16, 32, 64, 0.22);
+  box-shadow: none;
+  -gtk-icon-shadow: none;
+}
+
+check {
+  border-radius: 6px;
+}
+
+check:hover,
+radio:hover {
+  border-color: rgba(53, 132, 228, 0.6);
+}
+
+check:checked,
+check:indeterminate,
+radio:checked {
+  background-color: #3584e4;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.32), transparent 70%);
+  border-color: #1b6acb;
+  color: #ffffff;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.4);
+}
+
+check:checked:backdrop,
+check:indeterminate:backdrop,
+radio:checked:backdrop {
+  background-color: rgba(53, 132, 228, 0.7);
+  color: #ffffff;
+}
+
+switch {
+  background-color: rgba(16, 32, 64, 0.12);
+  border-color: rgba(16, 32, 64, 0.17);
+}
+
+switch:checked {
+  background-color: #3584e4;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.22), transparent 60%);
+  border-color: #1b6acb;
+}
+
+switch slider {
+  background-image: linear-gradient(to bottom, #ffffff, #e9eef5);
+  border-color: rgba(0, 0, 0, 0.18);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+progressbar trough {
+  background-color: rgba(16, 32, 64, 0.12);
+  border-color: transparent;
+}
+
+progressbar progress {
+  background-color: #3584e4;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), transparent 60%);
+  border-color: #1c6fd4;
+}
+
+scale trough {
+  background-color: rgba(16, 32, 64, 0.12);
+  border-color: transparent;
+}
+
+scale highlight {
+  background-color: #3584e4;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+  border-color: #1c6fd4;
+}
+
+scale slider {
+  background-image: linear-gradient(to bottom, #ffffff, #e9eef5);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+scale slider:hover {
+  border-color: rgba(53, 132, 228, 0.6);
+}
+
+notebook > header {
+  background-color: #e5eaef;
+  border-color: rgba(16, 32, 64, 0.1);
+}
+
+notebook > header.top > tabs > tab:checked {
+  box-shadow: inset 0 -3px #3584e4;
+}
+
+notebook > header.bottom > tabs > tab:checked {
+  box-shadow: inset 0 3px #3584e4;
+}
+
+notebook > header.left > tabs > tab:checked {
+  box-shadow: inset -3px 0 #3584e4;
+}
+
+notebook > header.right > tabs > tab:checked {
+  box-shadow: inset 3px 0 #3584e4;
+}
+
+menu,
+.menu,
+.context-menu {
+  background-color: #fbfcfe;
+  border: 1px solid rgba(16, 32, 64, 0.14);
+}
+
+menu menuitem:hover,
+.menu menuitem:hover,
+.context-menu menuitem:hover {
+  background-color: rgba(53, 132, 228, 0.16);
+  color: #18202b;
+}
+
+menubar > menuitem:hover {
+  background-color: rgba(53, 132, 228, 0.16);
+  color: #18202b;
+  box-shadow: inset 0 -2px #3584e4;
+}
+
+popover.background {
+  background-color: #fbfcfe;
+  background-image: linear-gradient(to bottom, #f1f6fd, #fbfcfe 80px);
+  border: 1px solid rgba(16, 32, 64, 0.14);
+  border-radius: 14px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.95), 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+popover modelbutton:hover,
+popover modelbutton.flat:hover {
+  background-color: rgba(53, 132, 228, 0.16);
+  color: #18202b;
+}
+
+.sidebar,
+placessidebar,
+placessidebar list,
+stacksidebar list {
+  background-color: #e6ecf4;
+  color: #18202b;
+  border-color: rgba(16, 32, 64, 0.1);
+}
+
+placessidebar row:selected,
+stacksidebar row:selected,
+.sidebar row:selected {
+  background-color: rgba(53, 132, 228, 0.2);
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.22), transparent);
+  color: #18202b;
+  box-shadow: inset 0 0 0 1px rgba(53, 132, 228, 0.35);
+}
+
+placessidebar row:selected label,
+placessidebar row:selected image,
+stacksidebar row:selected label,
+.sidebar row:selected label {
+  color: #18202b;
+}
+
+tooltip,
+tooltip.background {
+  background-color: rgba(20, 24, 32, 0.8);
+  color: #f4f7fb;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  text-shadow: none;
+}
+
+tooltip * {
+  color: #f4f7fb;
+}
+
+scrollbar slider {
+  background-color: rgba(24, 32, 43, 0.35);
+}
+
+scrollbar slider:hover {
+  background-color: rgba(53, 132, 228, 0.65);
+}
+
+infobar.info > revealer > box,
+infobar.question > revealer > box {
+  background-color: #d0e0f4;
+  color: #18202b;
+  border-bottom: 1px solid rgba(16, 32, 64, 0.1);
+}

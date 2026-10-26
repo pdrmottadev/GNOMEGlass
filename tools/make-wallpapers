@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Generates the "Lumen" day/night wallpapers: same geometry, two palettes.
+
+  tools/make-wallpapers [OUTPUT_DIR]   (default: wallpapers/)
+"""
+import sys
+
+W, H = 3840, 2160
+
+# Ribbons: (top edge, bottom edge reversed); each edge is an SVG path fragment
+RIBBONS = [
+    # wide band sweeping from the lower left to the upper right
+    ('M -300 1430 C 600 1060, 1350 1480, 2200 1120 S 3500 470, 4140 600',
+     'L 4140 1120 C 3500 1020, 2900 1460, 2150 1640 S 650 1720, -300 2020 Z'),
+    # thin band crossing above it
+    ('M -300 1060 C 500 880, 1250 1230, 2050 940 S 3250 420, 4140 260',
+     'L 4140 470 C 3300 640, 2700 1110, 1980 1220 S 650 1120, -300 1290 Z'),
+    # low sheet of glass along the bottom
+    ('M -300 1880 C 900 1640, 1850 2010, 2750 1760 S 3700 1390, 4140 1430',
+     'L 4140 2300 L -300 2300 Z'),
+]
+
+PALETTES = {
+    'day': dict(
+        bg=[('0', '#4fa3f0'), ('0.5', '#a6d0fa'), ('1', '#ffd6bf')],
+        glows=[(700, 330, 1150, '#86e6ff', 0.70), (3200, 1800, 1250, '#ffaf8a', 0.60),
+               (2700, 250, 850, '#9d8cff', 0.50)],
+        fills=[('#ffffff', 0.72, '#4f9dff', 0.16), ('#ffffff', 0.58, '#8576ff', 0.12),
+               ('#ffffff', 0.60, '#ffffff', 0.30)],
+        rim='#ffffff', rim_op=1.0, cool='#21b5ff', warm='#ff8a63', prism_op=0.60, glow_op=0.55,
+        shadow='#123c8c', shadow_op=0.22, caustic='#ffffff', caustic_op=0.35,
+    ),
+    'night': dict(
+        bg=[('0', '#040919'), ('0.5', '#0b1636'), ('1', '#1b1040')],
+        glows=[(850, 520, 1150, '#1d8cff', 0.50), (3100, 1650, 1250, '#7b3cff', 0.42),
+               (2500, 300, 800, '#00b8c4', 0.22)],
+        fills=[('#8fc4ff', 0.30, '#2a4fd0', 0.05), ('#b6a8ff', 0.24, '#5a2fd0', 0.04),
+               ('#8fb8ff', 0.18, '#1a2a70', 0.03)],
+        rim='#cfe9ff', rim_op=0.85, cool='#2fd2ff', warm='#ff6fae', prism_op=0.50, glow_op=0.55,
+        shadow='#000000', shadow_op=0.35, caustic='#5fb4ff', caustic_op=0.30,
+    ),
+}
+
+
+def svg(name, p):
+    out = []
+    a = out.append
+    a(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">')
+    a(f'  <!-- GNOME Glass — "Lumen" ({name}). Original artwork: ribbons of glass catching the light. -->')
+    a('  <!-- SPDX-FileCopyrightText: 2026 pdrmottadev -->')
+    a('  <!-- SPDX-License-Identifier: CC-BY-4.0 -->')
+    a('  <defs>')
+    a('    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">')
+    for off, col in p['bg']:
+        a(f'      <stop offset="{off}" stop-color="{col}"/>')
+    a('    </linearGradient>')
+    for i, (_, _, _, col, op) in enumerate(p['glows']):
+        a(f'    <radialGradient id="glow{i}">')
+        a(f'      <stop offset="0" stop-color="{col}" stop-opacity="{op}"/>')
+        a(f'      <stop offset="1" stop-color="{col}" stop-opacity="0"/>')
+        a('    </radialGradient>')
+    for i, (c1, o1, c2, o2) in enumerate(p['fills']):
+        a(f'    <linearGradient id="fill{i}" x1="0" y1="0" x2="0.15" y2="1">')
+        a(f'      <stop offset="0" stop-color="{c1}" stop-opacity="{o1}"/>')
+        a(f'      <stop offset="1" stop-color="{c2}" stop-opacity="{o2}"/>')
+        a('    </linearGradient>')
+    # the rim fades in and out along the ribbon, like light catching an edge
+    a('    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">')
+    a(f'      <stop offset="0" stop-color="{p["rim"]}" stop-opacity="0"/>')
+    a(f'      <stop offset="0.35" stop-color="{p["rim"]}" stop-opacity="{p["rim_op"]}"/>')
+    a(f'      <stop offset="0.7" stop-color="{p["rim"]}" stop-opacity="{p["rim_op"] * 0.5:.2f}"/>')
+    a(f'      <stop offset="1" stop-color="{p["rim"]}" stop-opacity="0.05"/>')
+    a('    </linearGradient>')
+    a('    <filter id="soft" x="-10%" y="-50%" width="120%" height="200%">')
+    a('      <feGaussianBlur stdDeviation="22"/>')
+    a('    </filter>')
+    a('  </defs>')
+    a(f'  <rect width="{W}" height="{H}" fill="url(#bg)"/>')
+    for i, (x, y, r, _, _) in enumerate(p['glows']):
+        a(f'  <circle cx="{x}" cy="{y}" r="{r}" fill="url(#glow{i})"/>')
+    for i, (top, bottom) in enumerate(RIBBONS):
+        a(f'  <g>')
+        bottom_stroke = 'M' + bottom[1:].removesuffix(' Z')
+        if i < 2:
+            # shadow under the glass and the light it focuses just below it
+            a(f'    <path d="{bottom_stroke}" fill="none" stroke="{p["shadow"]}" stroke-width="70" '
+              f'stroke-opacity="{p["shadow_op"]}" filter="url(#soft)" transform="translate(0 40)"/>')
+            a(f'    <path d="{top} {bottom}" fill="url(#fill{i})"/>')
+            a(f'    <path d="{bottom_stroke}" fill="none" stroke="{p["caustic"]}" stroke-width="18" '
+              f'stroke-opacity="{p["caustic_op"]}" filter="url(#soft)" transform="translate(0 14)"/>')
+            a(f'    <path d="{bottom_stroke}" fill="none" stroke="{p["rim"]}" stroke-width="2" '
+              f'stroke-opacity="{p["rim_op"] * 0.45:.2f}"/>')
+            # glow under the rim, the prism split (cool above, warm below), the rim itself
+            a(f'    <path d="{top}" fill="none" stroke="{p["rim"]}" stroke-width="46" '
+              f'stroke-opacity="{p["glow_op"]}" filter="url(#soft)"/>')
+            a(f'    <path d="{top}" fill="none" stroke="{p["cool"]}" stroke-width="5" '
+              f'stroke-opacity="{p["prism_op"]}" transform="translate(0 -3)"/>')
+            a(f'    <path d="{top}" fill="none" stroke="{p["warm"]}" stroke-width="5" '
+              f'stroke-opacity="{p["prism_op"] * 0.8:.2f}" transform="translate(0 4)"/>')
+            a(f'    <path d="{top}" fill="none" stroke="url(#rim)" stroke-width="5"/>')
+        else:
+            a(f'    <path d="{top} {bottom}" fill="url(#fill{i})"/>')
+            a(f'    <path d="{top}" fill="none" stroke="url(#rim)" stroke-width="3"/>')
+        a('  </g>')
+    a('</svg>')
+    return '\n'.join(out) + '\n'
+
+
+outdir = sys.argv[1] if len(sys.argv) > 1 else "wallpapers"
+for name, palette in PALETTES.items():
+    with open(f'{outdir}/gnomeglass-{name}.svg', 'w') as f:
+        f.write(svg(name, palette))

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=GNOME Glass
+Comment=Aero glass meets liquid glass, reimagined for GNOME 50+ (v1.1.0)
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=GNOMEGlass
+IconTheme=Adwaita
+CursorTheme=Adwaita
+ButtonLayout=appmenu:minimize,maximize,close

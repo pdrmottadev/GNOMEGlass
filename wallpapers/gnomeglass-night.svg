@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <!-- GNOME Glass — "Lumen" (night). Original artwork: ribbons of glass catching the light. -->
+  <!-- SPDX-FileCopyrightText: 2026 pdrmottadev -->
+  <!-- SPDX-License-Identifier: CC-BY-4.0 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#040919"/>
+      <stop offset="0.5" stop-color="#0b1636"/>
+      <stop offset="1" stop-color="#1b1040"/>
+    </linearGradient>
+    <radialGradient id="glow0">
+      <stop offset="0" stop-color="#1d8cff" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#1d8cff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow1">
+      <stop offset="0" stop-color="#7b3cff" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#7b3cff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2">
+      <stop offset="0" stop-color="#00b8c4" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#00b8c4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fill0" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0" stop-color="#8fc4ff" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#2a4fd0" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="fill1" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0" stop-color="#b6a8ff" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#5a2fd0" stop-opacity="0.04"/>
+    </linearGradient>
+    <linearGradient id="fill2" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0" stop-color="#8fb8ff" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#1a2a70" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe9ff" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#cfe9ff" stop-opacity="0.85"/>
+      <stop offset="0.7" stop-color="#cfe9ff" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#cfe9ff" stop-opacity="0.05"/>
+    </linearGradient>
+    <filter id="soft" x="-10%" y="-50%" width="120%" height="200%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/>
+  <circle cx="850" cy="520" r="1150" fill="url(#glow0)"/>
+  <circle cx="3100" cy="1650" r="1250" fill="url(#glow1)"/>
+  <circle cx="2500" cy="300" r="800" fill="url(#glow2)"/>
+  <g>
+    <path d="M 4140 1120 C 3500 1020, 2900 1460, 2150 1640 S 650 1720, -300 2020" fill="none" stroke="#000000" stroke-width="70" stroke-opacity="0.35" filter="url(#soft)" transform="translate(0 40)"/>
+    <path d="M -300 1430 C 600 1060, 1350 1480, 2200 1120 S 3500 470, 4140 600 L 4140 1120 C 3500 1020, 2900 1460, 2150 1640 S 650 1720, -300 2020 Z" fill="url(#fill0)"/>
+    <path d="M 4140 1120 C 3500 1020, 2900 1460, 2150 1640 S 650 1720, -300 2020" fill="none" stroke="#5fb4ff" stroke-width="18" stroke-opacity="0.3" filter="url(#soft)" transform="translate(0 14)"/>
+    <path d="M 4140 1120 C 3500 1020, 2900 1460, 2150 1640 S 650 1720, -300 2020" fill="none" stroke="#cfe9ff" stroke-width="2" stroke-opacity="0.38"/>
+    <path d="M -300 1430 C 600 1060, 1350 1480, 2200 1120 S 3500 470, 4140 600" fill="none" stroke="#cfe9ff" stroke-width="46" stroke-opacity="0.55" filter="url(#soft)"/>
+    <path d="M -300 1430 C 600 1060, 1350 1480, 2200 1120 S 3500 470, 4140 600" fill="none" stroke="#2fd2ff" stroke-width="5" stroke-opacity="0.5" transform="translate(0 -3)"/>
+    <path d="M -300 1430 C 600 1060, 1350 1480, 2200 1120 S 3500 470, 4140 600" fill="none" stroke="#ff6fae" stroke-width="5" stroke-opacity="0.40" transform="translate(0 4)"/>
+    <path d="M -300 1430 C 600 1060, 1350 1480, 2200 1120 S 3500 470, 4140 600" fill="none" stroke="url(#rim)" stroke-width="5"/>
+  </g>
+  <g>
+    <path d="M 4140 470 C 3300 640, 2700 1110, 1980 1220 S 650 1120, -300 1290" fill="none" stroke="#000000" stroke-width="70" stroke-opacity="0.35" filter="url(#soft)" transform="translate(0 40)"/>
+    <path d="M -300 1060 C 500 880, 1250 1230, 2050 940 S 3250 420, 4140 260 L 4140 470 C 3300 640, 2700 1110, 1980 1220 S 650 1120, -300 1290 Z" fill="url(#fill1)"/>
+    <path d="M 4140 470 C 3300 640, 2700 1110, 1980 1220 S 650 1120, -300 1290" fill="none" stroke="#5fb4ff" stroke-width="18" stroke-opacity="0.3" filter="url(#soft)" transform="translate(0 14)"/>
+    <path d="M 4140 470 C 3300 640, 2700 1110, 1980 1220 S 650 1120, -300 1290" fill="none" stroke="#cfe9ff" stroke-width="2" stroke-opacity="0.38"/>
+    <path d="M -300 1060 C 500 880, 1250 1230, 2050 940 S 3250 420, 4140 260" fill="none" stroke="#cfe9ff" stroke-width="46" stroke-opacity="0.55" filter="url(#soft)"/>
+    <path d="M -300 1060 C 500 880, 1250 1230, 2050 940 S 3250 420, 4140 260" fill="none" stroke="#2fd2ff" stroke-width="5" stroke-opacity="0.5" transform="translate(0 -3)"/>
+    <path d="M -300 1060 C 500 880, 1250 1230, 2050 940 S 3250 420, 4140 260" fill="none" stroke="#ff6fae" stroke-width="5" stroke-opacity="0.40" transform="translate(0 4)"/>
+    <path d="M -300 1060 C 500 880, 1250 1230, 2050 940 S 3250 420, 4140 260" fill="none" stroke="url(#rim)" stroke-width="5"/>
+  </g>
+  <g>
+    <path d="M -300 1880 C 900 1640, 1850 2010, 2750 1760 S 3700 1390, 4140 1430 L 4140 2300 L -300 2300 Z" fill="url(#fill2)"/>
+    <path d="M -300 1880 C 900 1640, 1850 2010, 2750 1760 S 3700 1390, 4140 1430" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  </g>
+</svg>

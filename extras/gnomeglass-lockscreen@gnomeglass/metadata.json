@@ -1,0 +1,7 @@
+{
+  "uuid": "gnomeglass-lockscreen@gnomeglass",
+  "name": "GNOME Glass: lock screen",
+  "description": "Keeps the GNOME Glass Shell theme on the lock screen. User Themes is disabled when the screen locks, and the Shell falls back to the default theme.",
+  "shell-version": ["50"],
+  "session-modes": ["user", "unlock-dialog"]
+}

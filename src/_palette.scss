@@ -1,0 +1,114 @@
+// GNOME Glass — shared palette
+// Frosted glass by day, smoked glass by night. The tint comes from the GNOME
+// accent color (Settings → Appearance): the Shell reads it at runtime
+// (-st-accent-color) and GTK4 through libadwaita (--accent-bg-color). GTK3
+// cannot follow it, so it uses $accent-fallback.
+//
+// Each entry file sets $variant: 'light' | 'dark' before importing.
+
+// --- Fixed colors (the same in both variants) -------------------------------
+
+// GNOME's default "blue" accent; used where the system accent is not available
+$accent-fallback:  #3584e4;
+
+// "Ember": the close button and destructive actions
+$ember-top:        #ff8f7a;
+$ember:            #e5483b;
+$ember-edge:       #b3261b;
+$ember-glow:       rgba(255, 92, 70, 0.55);
+
+// Semantic
+$success:          #26a269;
+$warning:          #e5a50a;
+$error:            #e5483b;
+
+// Smoked glass: tooltips, OSD, toasts, Alt+Tab (the same in both variants)
+$smoke:            rgba(20, 24, 32, 0.80);
+$smoke-dense:      rgba(20, 24, 32, 0.92);   // over windows: Alt+Tab, folders
+$smoke-solid:      #1c2029;
+$smoke-fg:         #f4f7fb;
+$smoke-rim:        rgba(255, 255, 255, 0.16);
+$smoke-edge:       rgba(0, 0, 0, 0.35);
+
+// --- Per-variant colors ------------------------------------------------------
+
+@function pick($light, $dark) {
+  @if $variant == 'dark' { @return $dark; }
+  @return $light;
+}
+
+// Surfaces
+$bg:               pick(#eef2f7, #181a20);
+$fg:               pick(#18202b, #e8ecf3);
+$fg-dim:           pick(#5b6474, #9aa3b2);
+$view-bg:          pick(#fbfcfe, #15171d);
+$view-fg:          pick(#18202b, #e8ecf3);
+$card-bg:          pick(#ffffff, #22262e);
+$card-border:      pick(rgba(16, 32, 64, 0.10), rgba(255, 255, 255, 0.07));
+$sidebar-bg:       pick(#e6ecf4, #252932);
+$sidebar-fg:       pick(#18202b, #e3e8f0);
+$sidebar-backdrop: pick(#ecf0f6, #21242b);
+$sidebar-border:   pick(rgba(16, 32, 64, 0.10), rgba(0, 0, 0, 0.35));
+$secondary-sidebar-bg:       pick(#edf1f7, #1c1f27);
+$secondary-sidebar-backdrop: pick(#f1f4f8, #1b1e24);
+$popover-bg:       pick(#fbfcfe, #262a33);
+$popover-fg:       pick(#18202b, #eef1f6);
+$dialog-bg:        pick(#f4f7fb, #20232b);
+
+// Glass: the bright top edge (rim) and the outline (edge) of every glass surface
+$rim:              pick(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.11));
+$edge:             pick(rgba(16, 32, 64, 0.14), rgba(0, 0, 0, 0.50));
+$hairline:         pick(rgba(16, 32, 64, 0.10), rgba(255, 255, 255, 0.08));
+
+// Title bar glass, before the accent tint (gtk.css mixes the accent in)
+$title-top:        pick(#fdfeff, #313642);
+$title-bottom:     pick(#e3e9f1, #22262e);
+$title-backdrop:   pick(#eef1f5, #24272e);
+$title-mid:        mix($title-top, $title-bottom, 50%);   // the frame around the floating sidebar
+$title-fg:         pick(#18202b, #f0f3f8);
+$title-tint:       pick(14%, 22%);   // how much accent goes into the title bar
+
+// Window control orbs (minimize/maximize) over the title bar
+$orb-top:          pick(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.20));
+$orb-bottom:       pick(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05));
+
+// Buttons
+$btn-top:          pick(#ffffff, #3b404c);
+$btn-bottom:       pick(#edf1f6, #2c3039);
+$btn-edge:         pick(rgba(16, 32, 64, 0.17), rgba(255, 255, 255, 0.10));
+$btn-fg:           pick(#18202b, #eef1f6);
+
+// Entries and checks
+$entry-bg:         pick(#ffffff, #121419);
+$entry-edge:       pick(rgba(16, 32, 64, 0.22), rgba(255, 255, 255, 0.13));
+$trough:           pick(rgba(16, 32, 64, 0.12), rgba(255, 255, 255, 0.12));
+$recess:           pick(rgba(16, 32, 64, 0.10), rgba(0, 0, 0, 0.32));   // toggle group trough
+
+// Accent-colored text/links on the surfaces above (GTK3 only; GTK4 and the
+// Shell derive it from the system accent)
+$accent-text:      pick(#1c6fd1, #78aeed);
+
+// Semantic text colors
+$success-text:     pick(#1b8553, #57e389);
+$warning-text:     pick(#9c6e03, #f8e45c);
+$error-text:       pick(#c7271b, #ff8a7e);
+
+// Shell: the floating islands of the top bar, the dash and popups
+$island-bg:        pick(rgba(250, 252, 255, 0.74), rgba(18, 21, 28, 0.62));
+$island-fg:        pick(#18202b, #ffffff);
+$island-rim:       pick(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.14));
+$island-edge:      pick(rgba(16, 32, 64, 0.14), rgba(0, 0, 0, 0.30));
+$island-hover:     pick(rgba(16, 32, 64, 0.08), rgba(255, 255, 255, 0.12));
+$island-active:    pick(rgba(16, 32, 64, 0.14), rgba(255, 255, 255, 0.20));
+
+// Popups are opaque: without blur, anything behind them would show through
+$shell-popup-top:    pick(#fdfeff, #282c36);
+$shell-popup-bottom: pick(#f0f4f9, #1c1f27);
+$shell-card:         pick(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.06));
+$shell-card-hover:   pick(#ffffff, rgba(255, 255, 255, 0.10));
+// Notifications are stacked on top of each other, so they must be opaque
+$shell-message:      pick(#ffffff, #30343e);
+$shell-message-hover: pick(#f7f9fc, #373c47);
+
+$dash-bg:          pick(rgba(250, 252, 255, 0.72), rgba(18, 21, 28, 0.60));   // dock on the desktop
+$overview-glass:   rgba(18, 21, 28, 0.45);   // dash and search in the overview (both variants)

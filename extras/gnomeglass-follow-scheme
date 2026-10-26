@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# GNOME Glass: switches the light/dark variants of the Shell and GTK3 themes
+# along with GNOME's light/dark mode. GTK4/libadwaita already does this on its
+# own.
+#
+# It only acts while the current GTK theme is GNOMEGlass*, so it doesn't
+# override another theme you pick later.
+
+IFACE=org.gnome.desktop.interface
+USER_THEME=org.gnome.shell.extensions.user-theme
+
+apply() {
+  local current target
+  current=$(gsettings get "$IFACE" gtk-theme)
+  [[ $current == "'GNOMEGlass"* ]] || return 0
+
+  case "$(gsettings get "$IFACE" color-scheme)" in
+    *dark*) target=GNOMEGlass-Dark ;;
+    *)      target=GNOMEGlass ;;
+  esac
+
+  [[ $current == "'$target'" ]] || gsettings set "$IFACE" gtk-theme "$target"
+  if gsettings list-keys "$USER_THEME" >/dev/null 2>&1; then
+    [[ $(gsettings get "$USER_THEME" name) == "'$target'" ]] ||
+      gsettings set "$USER_THEME" name "$target"
+  fi
+}
+
+apply
+gsettings monitor "$IFACE" color-scheme | while read -r _; do apply; done
